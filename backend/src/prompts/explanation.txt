@@ -1,0 +1,13 @@
+# Explanation Prompt Template
+
+题目：{question}
+用户答案：{user_answer}
+正确答案：{correct_answer}
+
+请给出详细解析：
+1. 分析用户答案对错
+2. 解释正确答案是何得出
+3. 关联相关知识点
+4. 如答错，给出理解提示
+
+要求：清晰、详细、帮助用户真正理解

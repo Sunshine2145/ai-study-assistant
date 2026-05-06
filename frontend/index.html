@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI伴学系统 - 智能备考助手</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- 主容器 -->
+    <div id="app" class="app-container">
+
+        <!-- 侧边栏导航 -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-robot"></i>
+                    <span>AI伴学</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-page="home">
+                    <i class="fas fa-home"></i>
+                    <span>学习首页</span>
+                </a>
+                <a href="#" class="nav-item" data-page="learn">
+                    <i class="fas fa-book-open"></i>
+                    <span>开始学习</span>
+                </a>
+                <a href="#" class="nav-item" data-page="map">
+                    <i class="fas fa-map"></i>
+                    <span>学习地图</span>
+                </a>
+                <a href="#" class="nav-item" data-page="practice">
+                    <i class="fas fa-pencil-alt"></i>
+                    <span>题目练习</span>
+                </a>
+                <a href="#" class="nav-item" data-page="wrong">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>错题本</span>
+                </a>
+                <a href="#" class="nav-item" data-page="report">
+                    <i class="fas fa-chart-line"></i>
+                    <span>学习报告</span>
+                </a>
+                <a href="#" class="nav-item" data-page="upload">
+                    <i class="fas fa-upload"></i>
+                    <span>题库上传</span>
+                </a>
+                <a href="#" class="nav-item" data-page="question-bank">
+                    <i class="fas fa-database"></i>
+                    <span>题库管理</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name" id="userName">加载中...</div>
+                        <div class="user-stats">
+                            <span class="streak"><i class="fas fa-fire"></i> <span id="streakDays">0</span>天</span>
+                            <span class="points"><i class="fas fa-star"></i> <span id="totalPoints">0</span>分</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="main-content" id="mainContent">
+
+            <!-- 顶部导航栏 -->
+            <header class="top-bar">
+                <button class="menu-btn" id="menuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="page-title" id="pageTitle">学习首页</div>
+                <div class="top-actions">
+                    <button class="icon-btn" title="学习提醒" id="reminderBtn">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge" id="reminderBadge">0</span>
+                    </button>
+                    <button class="icon-btn" title="帮助" id="helpBtn">
+                        <i class="fas fa-question-circle"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- 页面内容容器 -->
+            <div class="page-content" id="pageContent">
+
+                <!-- 首页 -->
+                <div class="page" id="page-home" style="display: block;">
+                    <!-- 今日学习卡片 -->
+                    <div class="card today-card">
+                        <div class="card-header">
+                            <div class="date-info">
+                                <div class="date" id="currentDate">加载中...</div>
+                                <div class="day-count">学习第 <strong id="learnDays">0</strong> 天</div>
+                            </div>
+                            <div class="streak-badge">
+                                <i class="fas fa-fire"></i>
+                                <span id="streakBadge">连续0天</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="greeting">
+                                <h2 id="greetingText">早上好！👋</h2>
+                                <p id="greetingDesc">正在加载学习内容...</p>
+                            </div>
+                            <div class="next-lesson">
+                                <div class="lesson-label">今日任务</div>
+                                <div class="lesson-card">
+                                    <div class="lesson-icon">
+                                        <i class="fas fa-microchip"></i>
+                                    </div>
+                                    <div class="lesson-info">
+                                        <h3 id="todayTitle">加载中...</h3>
+                                        <p id="todayDuration">预计学习时长：--分钟</p>
+                                    </div>
+                                    <button class="btn btn-primary" onclick="navigateTo('learn')">
+                                        开始学习 <i class="fas fa-arrow-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 学习进度概览 -->
+                    <div class="card progress-overview">
+                        <div class="card-header">
+                            <h3><i class="fas fa-chart-pie"></i> 学习进度</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="progress-stats">
+                                <div class="stat-item">
+                                    <div class="stat-value" id="statKnowledge">0/0</div>
+                                    <div class="stat-label">知识点</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value" id="statStreak">0</div>
+                                    <div class="stat-label">连续天数</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value" id="statPoints">0</div>
+                                    <div class="stat-label">总积分</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value" id="statWrong">0</div>
+                                    <div class="stat-label">错题数</div>
+                                </div>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-label">总进度</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="totalProgress" style="width: 0%"></div>
+                                </div>
+                                <div class="progress-percent" id="totalPercent">0%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 快速操作 -->
+                    <div class="card quick-actions">
+                        <div class="card-header">
+                            <h3><i class="fas fa-bolt"></i> 快速操作</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="action-grid">
+                                <button class="action-btn" onclick="navigateTo('practice')">
+                                    <i class="fas fa-pencil-alt"></i>
+                                    <span>开始练习</span>
+                                </button>
+                                <button class="action-btn" onclick="navigateTo('wrong')">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <span>复习错题</span>
+                                </button>
+                                <button class="action-btn" onclick="navigateTo('map')">
+                                    <i class="fas fa-map"></i>
+                                    <span>学习地图</span>
+                                </button>
+                                <button class="action-btn" onclick="navigateTo('report')">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span>学习报告</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 学习页面 -->
+                <div class="page" id="page-learn" style="display: none;">
+                    <div class="learning-interface">
+                        <!-- AI对话区域 -->
+                        <div class="chat-container">
+                            <div class="chat-messages" id="chatMessages">
+                                <!-- 消息将通过JS动态加载 -->
+                            </div>
+
+                            <!-- 输入区域 -->
+                            <div class="chat-input-container">
+                                <div class="socratic-hint" id="socraticHint">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span id="socraticText">苏格拉底提问准备中...</span>
+                                </div>
+                                <div class="chat-input">
+                                    <textarea placeholder="输入你的回答..." rows="2" id="userInput"></textarea>
+                                    <button class="btn-send" id="sendBtn">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 学习地图页面 -->
+                <div class="page" id="page-map" style="display: none;">
+                    <div class="map-container">
+                        <!-- 阶段选择器 -->
+                        <div class="stage-tabs" id="stageTabs">
+                            <!-- 阶段标签将通过JS动态加载 -->
+                        </div>
+
+                        <!-- 当前阶段信息 -->
+                        <div class="stage-info" id="stageInfo">
+                            <h2>加载中...</h2>
+                            <p>--</p>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 0%"></div>
+                            </div>
+                            <div class="progress-text">已完成 0/0 知识点 (0%)</div>
+                        </div>
+
+                        <!-- 知识点列表 -->
+                        <div class="knowledge-points" id="knowledgePoints">
+                            <!-- 知识点将通过JS动态加载 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 题目练习页面 -->
+                <div class="page" id="page-practice" style="display: none;">
+                    <div class="practice-container">
+                        <!-- 练习头部 -->
+                        <div class="practice-header">
+                            <div class="practice-title">
+                                <h2 id="practiceTitle">题目练习</h2>
+                                <span class="badge badge-info" id="practiceProgress">第1题/共5题</span>
+                            </div>
+                            <div class="practice-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="practiceFill" style="width: 0%"></div>
+                                </div>
+                                <span class="progress-text" id="practicePercent">0%</span>
+                            </div>
+                        </div>
+
+                        <!-- 题目卡片 -->
+                        <div class="question-card">
+                            <div class="question-type">
+                                <span class="badge badge-primary" id="questionType">加载中...</span>
+                            </div>
+                            <div class="question-content">
+                                <h3 id="questionContent">加载中...</h3>
+                            </div>
+                            <div class="options-list" id="optionsList">
+                                <!-- 选项将通过JS动态加载 -->
+                            </div>
+                        </div>
+
+                        <!-- 解析卡片（默认隐藏） -->
+                        <div class="analysis-card" id="analysisCard" style="display: none;">
+                            <div class="analysis-header" id="analysisHeader">
+                                <i class="fas fa-check-circle"></i>
+                                <span id="analysisResult">回答正确！ +10分</span>
+                            </div>
+                            <div class="analysis-content">
+                                <h4>📖 解析：</h4>
+                                <p id="analysisText">加载中...</p>
+                            </div>
+                        </div>
+
+                        <!-- 操作按钮 -->
+                        <div class="practice-actions">
+                            <button class="btn btn-outline" id="prevQuestion" disabled>
+                                <i class="fas fa-arrow-left"></i> 上一题
+                            </button>
+                            <button class="btn btn-primary" id="submitAnswer">
+                                提交答案
+                            </button>
+                            <button class="btn btn-primary" id="nextQuestion" style="display: none;">
+                                继续下一题 <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 错题本页面 -->
+                <div class="page" id="page-wrong" style="display: none;">
+                    <div class="wrong-container">
+                        <div class="page-header">
+                            <h2><i class="fas fa-exclamation-circle"></i> 错题本</h2>
+                            <div class="header-actions">
+                                <select class="select-filter" id="wrongFilter">
+                                    <option value="week">本周</option>
+                                    <option value="month">本月</option>
+                                    <option value="all">全部</option>
+                                </select>
+                                <button class="btn btn-sm btn-primary" id="reviewAllBtn">
+                                    <i class="fas fa-redo"></i> 一键复习
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="wrong-stats">
+                            <div class="stat">
+                                <i class="fas fa-book"></i>
+                                <span>共收录：<strong id="wrongCount">0道</strong>错题</span>
+                            </div>
+                        </div>
+
+                        <div class="wrong-list" id="wrongList">
+                            <!-- 错题将通过JS动态加载 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 学习报告页面 -->
+                <div class="page" id="page-report" style="display: none;">
+                    <div class="report-container">
+                        <div class="page-header">
+                            <h2><i class="fas fa-chart-line"></i> 今日学习报告</h2>
+                            <span class="date-badge" id="reportDate">2026-05-05</span>
+                        </div>
+
+                        <div class="report-success" id="reportSuccess">
+                            <div class="success-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <h3 id="reportStatus">✅ 今日任务已完成！</h3>
+                        </div>
+
+                        <div class="report-sections" id="reportSections">
+                            <!-- 报告卡片将通过JS动态加载 -->
+                        </div>
+
+                        <div class="report-actions">
+                            <button class="btn btn-outline" id="shareBtn">
+                                <i class="fas fa-share-alt"></i> 分享到飞书
+                            </button>
+                            <button class="btn btn-primary" onclick="navigateTo('learn')">
+                                明天继续 <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 题库上传页面 -->
+                <div class="page" id="page-upload" style="display: none;">
+                    <div class="upload-container">
+                        <div class="page-header">
+                            <h2><i class="fas fa-upload"></i> 题库上传</h2>
+                            <button class="btn btn-sm btn-outline" id="showTemplateBtn">
+                                <i class="fas fa-file-code"></i> 查看模板
+                            </button>
+                        </div>
+
+                        <div class="card upload-card">
+                            <div class="upload-zone" id="uploadZone">
+                                <div class="upload-icon">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                </div>
+                                <p class="upload-text">拖拽文件到此处，或 <label for="fileInput" class="upload-link">点击上传</label></p>
+                                <p class="upload-hint">支持 .txt、.json、.md、.pdf 格式</p>
+                                <input type="file" id="fileInput" accept=".txt,.json,.md,.pdf" style="display: none;">
+                            </div>
+
+                            <div class="upload-result" id="uploadResult" style="display: none;">
+                                <div class="result-header">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span id="resultMessage">上传成功！</span>
+                                </div>
+                                <div class="result-details">
+                                    <p>共发现 <strong id="totalFound">0</strong> 道题目</p>
+                                    <p>成功导入 <strong id="importedCount">0</strong> 道题目</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card format-info">
+                            <div class="card-header">
+                                <h3><i class="fas fa-info-circle"></i> 支持格式说明</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="format-tabs">
+                                    <button class="format-tab active" data-format="json">JSON格式</button>
+                                    <button class="format-tab" data-format="txt">TXT格式</button>
+                                    <button class="format-tab" data-format="md">Markdown格式</button>
+                                    <button class="format-tab" data-format="pdf">PDF格式</button>
+                                </div>
+                                <div class="format-content" id="formatContent">
+                                    <pre id="formatExample"></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card knowledge-select">
+                            <div class="card-header">
+                                <h3><i class="fas fa-book"></i> 关联知识点（可选）</h3>
+                            </div>
+                            <div class="card-body">
+                                <select class="select-filter" id="knowledgeSelect">
+                                    <option value="">-- 不关联特定知识点 --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="card ai-option">
+                            <div class="card-header">
+                                <h3><i class="fas fa-robot"></i> AI智能解析</h3>
+                            </div>
+                            <div class="card-body">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="useAiParse" checked>
+                                    <span>启用AI解析（自动识别题目结构）</span>
+                                </label>
+                                <div class="ai-provider-select" style="margin-top: 12px;">
+                                    <label style="font-size: 13px; color: var(--text-secondary); margin-right: 8px;">选择AI：</label>
+                                    <select id="aiProvider" style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-color);">
+                                        <option value="deepseek">DeepSeek（推荐，中文支持更好）</option>
+                                        <option value="minimax">MiniMax</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 题库管理页面 -->
+                <div class="page" id="page-question-bank" style="display: none;">
+                    <div class="question-bank-container">
+                        <div class="page-header">
+                            <h2><i class="fas fa-database"></i> 题库管理</h2>
+                            <div class="header-actions">
+                                <button class="btn btn-sm btn-outline" onclick="refreshQuestionBank()">
+                                    <i class="fas fa-sync"></i> 刷新
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 题库统计 -->
+                        <div class="bank-stats" id="bankStats">
+                            <div class="stat-card">
+                                <div class="stat-icon"><i class="fas fa-book"></i></div>
+                                <div class="stat-info">
+                                    <div class="stat-value" id="totalQuestions">0</div>
+                                    <div class="stat-label">总题目数</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon approved"><i class="fas fa-check"></i></div>
+                                <div class="stat-info">
+                                    <div class="stat-value" id="approvedQuestions">0</div>
+                                    <div class="stat-label">已启用</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon pending"><i class="fas fa-clock"></i></div>
+                                <div class="stat-info">
+                                    <div class="stat-value" id="pendingQuestions">0</div>
+                                    <div class="stat-label">待审核</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 题库列表 -->
+                        <div class="card bank-list-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-list"></i> 题库列表</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="bank-list" id="bankList">
+                                    <p class="empty-hint">正在加载题库...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 题目列表 -->
+                        <div class="card questions-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-file-alt"></i> 题目列表</h3>
+                                <div class="filter-actions">
+                                    <select class="select-filter" id="questionTypeFilter">
+                                        <option value="">全部类型</option>
+                                        <option value="single">单选题</option>
+                                        <option value="multi">多选题</option>
+                                        <option value="judge">判断题</option>
+                                    </select>
+                                    <select class="select-filter" id="questionStatusFilter">
+                                        <option value="">全部状态</option>
+                                        <option value="approved">已启用</option>
+                                        <option value="pending">待审核</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="questions-list" id="questionsList">
+                                    <p class="empty-hint">请先选择一个题库</p>
+                                </div>
+                                <div class="pagination" id="questionPagination"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

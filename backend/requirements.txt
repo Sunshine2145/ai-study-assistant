@@ -1,0 +1,30 @@
+# AI伴学系统 - 后端依赖
+
+# Core
+python>=3.10
+
+# Web Framework
+fastapi==0.109.0
+uvicorn==0.27.0
+
+# Database
+# sqlite3 is built-in to Python
+
+# AI
+aiohttp==3.9.1
+
+# PDF Processing
+PyMuPDF==1.23.8
+
+# Scheduling
+APScheduler==3.10.4
+
+# Configuration
+pyyaml==6.0.1
+python-dotenv==1.0.0
+
+# Logging
+loguru==0.7.2
+
+# Utilities
+pydantic==2.5.3
