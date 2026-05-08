@@ -109,6 +109,9 @@ const api = {
     async approveQuestion(questionId) {
         return await this.request(`/question-bank/approve/${questionId}`, { method: 'POST' });
     },
+    async deleteBank(source) {
+        return await this.request(`/question-bank/bank/${encodeURIComponent(source)}`, { method: 'DELETE' });
+    },
     async getLearningProgress(knowledgeId) { return await this.request(`/learning/progress/${knowledgeId}`); },
     async completeLearningStep(knowledgeId, step) {
         return await this.request(`/learning/progress/${knowledgeId}/complete?step=${step}`, { method: 'POST' });
@@ -931,6 +934,9 @@ function renderBankList(banks) {
                 <button class="btn btn-sm btn-outline" onclick="loadQuestions('${bank.source}')">
                     <i class="fas fa-eye"></i> 查看题目
                 </button>
+                <button class="btn btn-sm btn-danger" onclick="deleteBank('${bank.source}')">
+                    <i class="fas fa-trash"></i> 删除
+                </button>
             </div>
         </div>
     `).join('');
@@ -1047,6 +1053,18 @@ async function deleteQuestion(id) {
         if (currentQuestionSource) loadQuestions(currentQuestionSource, currentQuestionPage);
     } else {
         showToast('删除失败', 'error');
+    }
+}
+
+async function deleteBank(source) {
+    if (!confirm(`确定要删除题库「${source}」吗？该操作将删除此题库下的所有题目，且不可恢复！`)) return;
+    const result = await api.deleteBank(source);
+    if (result && result.message) {
+        showToast(result.message, 'success');
+        currentQuestionSource = null;
+        loadQuestionBankData();
+    } else {
+        showToast(result?.detail || '删除失败', 'error');
     }
 }
 

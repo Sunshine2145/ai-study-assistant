@@ -1,6 +1,6 @@
 # AI Study Assistant - Question Bank Routes
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from typing import Optional
 
 from src.modules.question import question_service
@@ -12,6 +12,15 @@ router = APIRouter(prefix="/api/question-bank", tags=["题库"])
 async def get_question_banks():
     """获取题库列表（按来源分组）"""
     return {"data": question_service.get_banks()}
+
+
+@router.delete("/bank/{source:path}")
+async def delete_bank(source: str):
+    """删除整个题库（按来源）"""
+    count = question_service.delete_by_source(source)
+    if count == 0:
+        raise HTTPException(status_code=404, detail="题库不存在或已为空")
+    return {"message": f"已删除题库「{source}」，共移除 {count} 道题目"}
 
 
 @router.get("/questions")
