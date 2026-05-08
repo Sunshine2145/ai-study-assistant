@@ -237,5 +237,47 @@ def init_database():
         db.execute("ALTER TABLE learning_progress ADD COLUMN last_socratic_at DATETIME")
     except:
         pass
+    try:
+        db.execute("ALTER TABLE learning_progress ADD COLUMN learning_phase TEXT DEFAULT 'feynman'")
+    except:
+        pass
+    try:
+        db.execute("ALTER TABLE learning_progress ADD COLUMN socratic_history TEXT")
+    except:
+        pass
+
+    # Document upload tracking table
+    db.execute("""
+        CREATE TABLE IF NOT EXISTS document_upload (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            filename TEXT,
+            file_type TEXT,
+            file_size INTEGER,
+            classification TEXT,
+            ai_parsed INTEGER DEFAULT 0,
+            questions_imported INTEGER DEFAULT 0,
+            knowledge_points_imported INTEGER DEFAULT 0,
+            status TEXT DEFAULT 'processing',
+            error_message TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+    """)
+
+    # Knowledge detail table (extended knowledge base)
+    db.execute("""
+        CREATE TABLE IF NOT EXISTS knowledge_detail (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            knowledge_point_id INTEGER UNIQUE,
+            content TEXT,
+            feynman_material TEXT,
+            key_concepts TEXT,
+            source_document TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (knowledge_point_id) REFERENCES knowledge_points(id)
+        )
+    """)
 
     logger.info("Database initialized successfully")

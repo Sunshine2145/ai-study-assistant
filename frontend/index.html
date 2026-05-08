@@ -28,13 +28,13 @@
                     <i class="fas fa-home"></i>
                     <span>学习首页</span>
                 </a>
-                <a href="#" class="nav-item" data-page="learn">
-                    <i class="fas fa-book-open"></i>
-                    <span>开始学习</span>
-                </a>
                 <a href="#" class="nav-item" data-page="map">
                     <i class="fas fa-map"></i>
                     <span>学习地图</span>
+                </a>
+                <a href="#" class="nav-item" data-page="learn">
+                    <i class="fas fa-book-open"></i>
+                    <span>开始学习</span>
                 </a>
                 <a href="#" class="nav-item" data-page="practice">
                     <i class="fas fa-pencil-alt"></i>
@@ -380,8 +380,8 @@
                                     <i class="fas fa-cloud-upload-alt"></i>
                                 </div>
                                 <p class="upload-text">拖拽文件到此处，或 <label for="fileInput" class="upload-link">点击上传</label></p>
-                                <p class="upload-hint">支持 .txt、.json、.md、.pdf 格式</p>
-                                <input type="file" id="fileInput" accept=".txt,.json,.md,.pdf" style="display: none;">
+                                <p class="upload-hint">支持 .txt、.json、.md、.pdf、.docx、.xlsx 格式</p>
+                                <input type="file" id="fileInput" accept=".txt,.json,.md,.pdf,.docx,.xlsx" style="display: none;">
                             </div>
 
                             <div class="upload-result" id="uploadResult" style="display: none;">
@@ -406,6 +406,8 @@
                                     <button class="format-tab" data-format="txt">TXT格式</button>
                                     <button class="format-tab" data-format="md">Markdown格式</button>
                                     <button class="format-tab" data-format="pdf">PDF格式</button>
+                                    <button class="format-tab" data-format="docx">Word格式</button>
+                                    <button class="format-tab" data-format="xlsx">Excel格式</button>
                                 </div>
                                 <div class="format-content" id="formatContent">
                                     <pre id="formatExample"></pre>
@@ -454,6 +456,82 @@
                                 <button class="btn btn-sm btn-outline" onclick="refreshQuestionBank()">
                                     <i class="fas fa-sync"></i> 刷新
                                 </button>
+                            </div>
+                        </div>
+
+                        <!-- 管理标签页 -->
+                        <div class="manage-tabs" id="manageTabs">
+                            <button class="manage-tab active" data-tab="questions">题目管理</button>
+                            <button class="manage-tab" data-tab="knowledge">知识点管理</button>
+                        </div>
+
+                        <!-- 知识点管理（默认隐藏） -->
+                        <div class="knowledge-manage-section" id="knowledgeManageSection" style="display: none;">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3><i class="fas fa-brain"></i> 知识点列表</h3>
+                                    <button class="btn btn-sm btn-primary" onclick="showAddKnowledgeForm()">
+                                        <i class="fas fa-plus"></i> 添加知识点
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div class="knowledge-manage-list" id="knowledgeManageList">
+                                        <p class="empty-hint">正在加载知识点...</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 知识点表单（默认隐藏） -->
+                            <div class="card knowledge-form-card" id="knowledgeFormCard" style="display: none;">
+                                <div class="card-header">
+                                    <h3 id="knowledgeFormTitle"><i class="fas fa-plus"></i> 添加知识点</h3>
+                                    <button class="btn btn-sm btn-outline" onclick="hideKnowledgeForm()">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <form id="knowledgeForm" onsubmit="saveKnowledgePoint(event)">
+                                        <input type="hidden" id="kpEditId" value="">
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label>编码 <span class="required">*</span></label>
+                                                <input type="text" id="kpCode" required placeholder="如 1.2.3">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>名称 <span class="required">*</span></label>
+                                                <input type="text" id="kpName" required placeholder="知识点名称">
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label>章节</label>
+                                                <input type="text" id="kpChapter" placeholder="所属章节">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>阶段</label>
+                                                <input type="text" id="kpStage" placeholder="所属阶段">
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label>排序</label>
+                                                <input type="number" id="kpSortOrder" value="0">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>状态</label>
+                                                <select id="kpStatus">
+                                                    <option value="locked">锁定</option>
+                                                    <option value="unlocked">解锁</option>
+                                                    <option value="completed">已完成</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-actions">
+                                            <button type="button" class="btn btn-outline" onclick="hideKnowledgeForm()">取消</button>
+                                            <button type="submit" class="btn btn-primary">保存</button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
 
@@ -526,6 +604,6 @@
         </main>
     </div>
 
-    <script src="js/app.js"></script>
+    <script src="js/app.js?v=1.5.1"></script>
 </body>
 </html>

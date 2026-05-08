@@ -138,13 +138,10 @@ def init_knowledge_points():
     db.execute(
         "UPDATE knowledge_points SET status = 'unlocked', sort_order = 1 WHERE code = '1.1'"
     )
-    # Set correct sort order for all points
-    db.execute("""
-        UPDATE knowledge_points SET sort_order = (
-            SELECT COUNT(*) FROM knowledge_points p2 
-            WHERE p2.code <= knowledge_points.code
-        )
-    """)
+    # Set correct sort order for all points (by code ordering)
+    all_kps = db.fetch_all("SELECT id, code FROM knowledge_points ORDER BY code")
+    for i, (kp_id, code) in enumerate(all_kps, 1):
+        db.execute("UPDATE knowledge_points SET sort_order = ? WHERE id = ?", (i, kp_id))
     print("Unlocked first knowledge point: 1.1 计算机系统概述")
 
     print("Knowledge points initialization complete!")

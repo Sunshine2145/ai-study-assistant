@@ -242,9 +242,12 @@ async def select_learning_unit(knowledge_id: int):
     )
 
     db.execute("""
-        INSERT INTO learning_progress (user_id, knowledge_point_id, mastery_percentage, socratic_rounds)
-        VALUES (1, ?, 0, 0)
+        INSERT INTO learning_progress (user_id, knowledge_point_id, mastery_percentage, socratic_rounds, learning_phase)
+        VALUES (1, ?, 0, 0, 'feynman')
         ON CONFLICT(user_id, knowledge_point_id) DO UPDATE SET
+        learning_phase = 'feynman',
+        mastery_percentage = 0,
+        socratic_rounds = 0,
         updated_at = CURRENT_TIMESTAMP
     """, (knowledge_id,))
 
@@ -255,7 +258,7 @@ async def select_learning_unit(knowledge_id: int):
 async def get_mastery_status(knowledge_id: int):
     """获取掌握度状态"""
     result = db.fetch_one("""
-        SELECT mastery_percentage, socratic_rounds, feynman_completed, practice_completed
+        SELECT mastery_percentage, socratic_rounds, feynman_completed, practice_completed, learning_phase
         FROM learning_progress
         WHERE knowledge_point_id = ?
     """, (knowledge_id,))
@@ -266,6 +269,7 @@ async def get_mastery_status(knowledge_id: int):
             "socratic_rounds": 0,
             "feynman_completed": False,
             "practice_completed": False,
+            "learning_phase": "feynman",
             "threshold_met": False
         }
 
@@ -274,6 +278,7 @@ async def get_mastery_status(knowledge_id: int):
         "socratic_rounds": result[1],
         "feynman_completed": bool(result[2]),
         "practice_completed": bool(result[3]),
+        "learning_phase": result[4] or "feynman",
         "threshold_met": result[0] >= 90,
         "message": "已达标，可以进入练习" if result[0] >= 90 else f"还需{90 - result[0]}%掌握度"
     }
@@ -304,9 +309,15 @@ async def unlock_next_unit(knowledge_id: int):
 
     db.execute("""
         UPDATE learning_progress
-        SET feynman_completed = 1, feynman_completed_at = CURRENT_TIMESTAMP
+        SET feynman_completed = 1, feynman_completed_at = CURRENT_TIMESTAMP, learning_phase = 'completed'
         WHERE knowledge_point_id = ?
     """, (knowledge_id,))
+
+    # 标记当前知识点为已完成
+    db.execute(
+        "UPDATE knowledge_points SET status = 'completed' WHERE id = ?",
+        (knowledge_id,)
+    )
 
     current_kp = db.fetch_one(
         "SELECT code, sort_order FROM knowledge_points WHERE id = ?",

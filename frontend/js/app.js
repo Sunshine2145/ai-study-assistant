@@ -17,7 +17,8 @@ const state = {
     questions: [],
     currentQuestionIndex: 0,
     wrongQuestions: [],
-    stageData: []
+    stageData: [],
+    learningPhase: 'feynman'
 };
 
 // ========================================
@@ -245,9 +246,22 @@ async function loadLearnData() {
 async function loadMapData() {
     const result = await api.getKnowledgePoints();
     const stageTabs = document.getElementById('stageTabs');
-    if (!result || !result.data) { renderStageTabsDemo(); renderKnowledgePointsDemo(1); return; }
+    const knowledgePointsEl = document.getElementById('knowledgePoints');
+    const stageInfoEl = document.getElementById('stageInfo');
+    if (!result || !result.data || result.data.length === 0) {
+        stageTabs.innerHTML = '';
+        knowledgePointsEl.innerHTML = '<div style="text-align:center;padding:48px;color:#64748b;"><i class="fas fa-map" style="font-size:48px;margin-bottom:16px;display:block;"></i><p>暂无知识点数据</p><p style="font-size:13px;margin-top:8px;">请稍后刷新页面重试</p></div>';
+        if (stageInfoEl) stageInfoEl.style.display = 'none';
+        return;
+    }
+    if (stageInfoEl) stageInfoEl.style.display = '';
     state.stageData = result.data;
-    const stages = [...new Set(result.data.map(k => k.stage))].sort();
+    const cnNum = {'一':1,'二':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9,'十':10};
+    const stages = [...new Set(result.data.map(k => k.stage))].sort((a, b) => {
+        const mA = a.match(/[一二三四五六七八九十]/);
+        const mB = b.match(/[一二三四五六七八九十]/);
+        return (cnNum[mA?.[0]] || 0) - (cnNum[mB?.[0]] || 0);
+    });
     stageTabs.innerHTML = stages.map((stage, index) => `<button class="stage-tab ${index === 0 ? 'active' : ''}" data-stage="${stage}">${stage}</button>`).join('');
     initStageTabs();
     if (stages.length > 0) renderKnowledgePoints(stages[0]);
@@ -479,12 +493,7 @@ function initStageTabs() {
             document.querySelectorAll('.stage-tab').forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
             const stage = tab.getAttribute('data-stage');
-            const matchingPoints = state.stageData.filter(k => k.stage === stage);
-            if (matchingPoints.length > 0) {
-                renderKnowledgePoints(stage);
-            } else {
-                renderKnowledgePointsDemo(parseInt(stage));
-            }
+            renderKnowledgePoints(stage);
         });
     });
 }
@@ -511,33 +520,37 @@ async function sendMessage() {
     if (result && result.data) {
         addAIMessage(result.data.response);
 
+        // 更新学习阶段
+        if (result.data.learning_phase) {
+            state.learningPhase = result.data.learning_phase;
+            updatePhaseDisplay();
+
+            // 更新输入框 placeholder
+            if (result.data.learning_phase === 'interactive') {
+                userInput.placeholder = '输入你的问题，或输入「学习好了」...';
+            } else if (result.data.learning_phase === 'socratic') {
+                userInput.placeholder = '输入你的回答...';
+            } else if (result.data.learning_phase === 'completed') {
+                userInput.placeholder = '学习已完成，前往地图选择下一个知识点';
+            }
+        }
+
+        // 更新掌握度显示
         const masteryPercent = result.data.mastery_percentage || 0;
-        const socraticRounds = result.data.socratic_rounds || 0;
-        const canPractice = result.data.can_practice || false;
         const knowledgeName = result.data.knowledge_name || state.currentKnowledge?.name || '';
 
-        if (knowledgeName) {
-            document.getElementById('socraticText').textContent = `📚 ${knowledgeName} | 掌握度：${masteryPercent}%`;
-        } else {
-            document.getElementById('socraticText').textContent = `📊 掌握度：${masteryPercent}%`;
-        }
-
-        if (canPractice || masteryPercent >= 90) {
-            showToast('🎉 恭喜！已达到90%掌握度！', 'success');
-        }
-
-        if (result.data.socratic_hint) {
-            if (canPractice || masteryPercent >= 90) {
-                document.getElementById('socraticText').textContent = '🎉 达成90%掌握度！可以解锁下一单元了';
-            } else {
-                document.getElementById('socraticText').textContent = result.data.socratic_hint;
-            }
+        if (result.data.learning_phase === 'completed') {
+            document.getElementById('socraticText').textContent = `🎉 已完成「${knowledgeName}」！前往学习地图选择下一个知识点`;
+            showToast('🎉 恭喜！已掌握该知识点！', 'success');
+        } else if (masteryPercent > 0) {
+            document.getElementById('socraticText').textContent = `🎯 ${knowledgeName} | 掌握度：${masteryPercent}%`;
+        } else if (result.data.socratic_hint) {
+            document.getElementById('socraticText').textContent = result.data.socratic_hint;
         }
     } else {
         setTimeout(() => {
-            const responses = ['很好的理解！让我再问你一个问题：为什么RISC指令集通常需要更多的指令来完成同样的任务？', '你的思考方向是对的。让我们继续深入：CISC和RISC在编译器设计上有什么不同的要求？', '说得好！现在让我们做个小测试，来做几道题巩固一下这个知识点吧。', '理解得很到位！这就是费曼学习法的精髓 - 用简单的语言讲清楚复杂的概念。'];
-            addAIMessage(responses[Math.floor(Math.random() * responses.length)]);
-        }, 1000);
+            addAIMessage('AI服务暂时不可用，请稍后重试。');
+        }, 500);
     }
 }
 
@@ -575,48 +588,115 @@ async function startLearn(code) {
 async function reviewWrong(id) { navigateTo('practice'); }
 
 async function selectKnowledgePoint(knowledgeId, knowledgeName) {
+    // 先跳转到学习模块，显示加载提示
+    navigateTo('learn');
+    const chatMessages = document.getElementById('chatMessages');
+    chatMessages.innerHTML = `<div class="message ai-message"><div class="message-avatar"><i class="fas fa-robot"></i></div><div class="message-content"><div class="message-sender">AI伴学助手</div><div class="message-text"><p>正在加载${knowledgeName}学习内容，请稍后...</p></div><div class="message-time">${getCurrentTime()}</div></div></div>`;
+
     const result = await api.selectLearningUnit(knowledgeId);
     if (result && result.success) {
-        showToast(`已选择「${knowledgeName}」，开始学习`, 'success');
         state.currentKnowledge = { id: knowledgeId, name: knowledgeName };
         await loadLearnDataWithFeynman(knowledgeId);
-        navigateTo('learn');
     } else {
+        chatMessages.innerHTML = '';
         showToast(result.message || '选择失败，请检查是否已解锁', 'error');
     }
 }
 
+function renderPhaseIndicator(currentPhase) {
+    const phases = [
+        { key: 'feynman', label: '1.费曼学习', icon: 'fa-book-open' },
+        { key: 'interactive', label: '2.互动学习', icon: 'fa-comments' },
+        { key: 'socratic', label: '3.苏格拉底检验', icon: 'fa-brain' }
+    ];
+    const phaseOrder = ['feynman', 'interactive', 'socratic', 'completed'];
+    const currentIdx = phaseOrder.indexOf(currentPhase);
+
+    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+        ${phases.map((p, i) => {
+            const pIdx = phaseOrder.indexOf(p.key);
+            const isCompleted = currentIdx > pIdx || currentPhase === 'completed';
+            const isCurrent = currentPhase === p.key;
+            let bg, color;
+            if (isCompleted) { bg = '#10B981'; color = 'white'; }
+            else if (isCurrent) { bg = '#2563EB'; color = 'white'; }
+            else { bg = '#e2e8f0'; color = '#64748b'; }
+            const checkmark = isCompleted ? '✓ ' : '';
+            return `<span style="background:${bg};color:${color};padding:4px 12px;border-radius:16px;font-size:12px;">${checkmark}${p.label}</span>`;
+        }).join('<span style="color:#94a3b8;">→</span>')}
+    </div>`;
+}
+
+function updatePhaseDisplay() {
+    const phase = state.learningPhase;
+    const socraticText = document.getElementById('socraticText');
+    const knowledgeName = state.currentKnowledge?.name || '当前知识点';
+
+    switch (phase) {
+        case 'feynman':
+            socraticText.textContent = `📖 费曼学习 → ${knowledgeName}`;
+            break;
+        case 'interactive':
+            socraticText.textContent = `💬 互动学习 → ${knowledgeName} | 可随时输入「学习好了」进入检验`;
+            break;
+        case 'socratic':
+            socraticText.textContent = `🎯 苏格拉底检验 → ${knowledgeName} | 达到90%掌握度解锁下一单元`;
+            break;
+        case 'completed':
+            socraticText.textContent = `🎉 已完成 ${knowledgeName}！前往学习地图选择下一个知识点`;
+            break;
+        default:
+            socraticText.textContent = `📚 ${knowledgeName}`;
+    }
+}
+
+function transitionToSocratic() {
+    const userInput = document.getElementById('userInput');
+    userInput.value = '学习好了';
+    sendMessage();
+}
+
 async function loadLearnDataWithFeynman(knowledgeId) {
     const chatMessages = document.getElementById('chatMessages');
-    chatMessages.innerHTML = `<div class="message ai-message"><div class="message-avatar"><i class="fas fa-robot"></i></div><div class="message-content"><div class="message-sender">AI伴学助手</div><div class="message-text"><p>正在生成费曼讲解...</p></div><div class="message-time">${getCurrentTime()}</div></div></div>`;
+    chatMessages.innerHTML = `<div class="message ai-message"><div class="message-avatar"><i class="fas fa-robot"></i></div><div class="message-content"><div class="message-sender">AI伴学助手</div><div class="message-text"><p>正在加载学习内容...</p></div><div class="message-time">${getCurrentTime()}</div></div></div>`;
 
     const mastery = await api.getMastery(knowledgeId);
-    const masteryPercent = mastery?.mastery_percentage || 0;
-    const socraticRounds = mastery?.socratic_rounds || 0;
+    const phase = mastery?.learning_phase || 'feynman';
+    state.learningPhase = phase;
 
-    let stageIndicator = `<div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
-        <span style="background:#2563EB;color:white;padding:4px 12px;border-radius:16px;font-size:12px;">1.费曼学习</span>
-        <span style="color:#94a3b8;">→</span>
-        <span style="background:#e2e8f0;color:#64748b;padding:4px 12px;border-radius:16px;font-size:12px;">2.苏格拉底</span>
-        <span style="color:#94a3b8;">→</span>
-        <span style="background:#e2e8f0;color:#64748b;padding:4px 12px;border-radius:16px;font-size:12px;">3.解锁下一单元</span>
-    </div>`;
+    const knowledgeName = state.currentKnowledge?.name || '当前知识点';
 
+    // 根据阶段渲染不同UI
+    chatMessages.innerHTML = '';
+
+    if (phase === 'completed') {
+        addAIMessage(`<div style="margin-bottom:16px;">${renderPhaseIndicator('completed')}</div><div style="text-align:center;padding:32px 0;"><i class="fas fa-check-circle" style="font-size:48px;color:#10B981;margin-bottom:16px;"></i><h3 style="color:#10B981;">已完成「${knowledgeName}」的学习！</h3><p style="color:#64748b;margin-top:8px;">前往学习地图选择下一个知识点继续学习。</p></div>`);
+        updatePhaseDisplay();
+        return;
+    }
+
+    if (phase === 'socratic') {
+        addAIMessage(`<div style="margin-bottom:16px;">${renderPhaseIndicator('socratic')}</div><div style="text-align:center;padding:24px 0;"><i class="fas fa-brain" style="font-size:40px;color:#2563EB;margin-bottom:12px;"></i><h3>苏格拉底检验进行中</h3><p style="color:#64748b;margin-top:8px;">当前掌握度：${mastery?.mastery_percentage || 0}%（需要达到90%）</p><p style="color:#64748b;">请回答AI的问题来提升掌握度。</p></div>`);
+        const userInput = document.getElementById('userInput');
+        userInput.placeholder = '输入你的回答...';
+        updatePhaseDisplay();
+        return;
+    }
+
+    // feynman 或 interactive 阶段 — 加载费曼内容
     const feynmanResult = await api.getFeynmanContent(knowledgeId);
 
     if (feynmanResult && feynmanResult.success && feynmanResult.data) {
         const feynmanContent = feynmanResult.data.content;
-        const knowledgeName = feynmanResult.data.knowledge_name;
-        state.currentKnowledge = { id: knowledgeId, name: knowledgeName };
-        chatMessages.innerHTML = '';
-        addAIMessage(`<p style="margin-bottom:16px;">欢迎开始学习之旅！</p>${stageIndicator}<div class="feynman-card"><div class="feynman-header"><i class="fas fa-lightbulb"></i><strong>费曼学习法讲解：${knowledgeName}</strong></div><div class="feynman-content">${feynmanContent}</div></div><p style="margin-top:16px;">学完以后，用一句话解释一下这个概念~</p><div style="margin-top:12px;padding:12px;background:#fef3c7;border-radius:8px;"><i class="fas fa-target"></i> <strong>学习目标：</strong>通过苏格拉底问答达到90%掌握度后解锁下一单元</div>`);
+        state.currentKnowledge = { id: knowledgeId, name: feynmanResult.data.knowledge_name };
+        addAIMessage(`<div style="margin-bottom:16px;">${renderPhaseIndicator(phase)}</div><div class="feynman-card"><div class="feynman-header"><i class="fas fa-lightbulb"></i><strong>费曼学习法讲解：${feynmanResult.data.knowledge_name}</strong></div><div class="feynman-content">${feynmanContent}</div></div><p style="margin-top:16px;">现在你可以：</p><ul style="margin-top:8px;padding-left:20px;"><li>💬 输入你对这个知识点的疑问，我会为你解答</li><li>✅ 输入「<strong>学习好了</strong>」进入苏格拉底检验环节</li></ul><div style="margin-top:12px;"><button onclick="transitionToSocratic()" style="background:#2563EB;color:white;padding:8px 20px;border:none;border-radius:8px;cursor:pointer;font-size:14px;"><i class="fas fa-arrow-right"></i> 直接进入检验</button></div>`);
     } else {
-        chatMessages.innerHTML = '';
-        addAIMessage(`<p style="margin-bottom:16px;">欢迎开始学习之旅！</p>${stageIndicator}<p>知识点讲解内容正在准备中，请先尝试用自己的语言描述一下这个概念。</p><div style="margin-top:12px;padding:12px;background:#fef3c7;border-radius:8px;"><i class="fas fa-target"></i> <strong>学习目标：</strong>通过苏格拉底问答达到90%掌握度后解锁下一单元</div>`);
+        addAIMessage(`<div style="margin-bottom:16px;">${renderPhaseIndicator(phase)}</div><p>知识点讲解内容正在准备中。现在你可以：</p><ul style="margin-top:8px;padding-left:20px;"><li>💬 输入你对这个知识点的疑问</li><li>✅ 输入「<strong>学习好了</strong>」进入检验环节</li></ul><div style="margin-top:12px;"><button onclick="transitionToSocratic()" style="background:#2563EB;color:white;padding:8px 20px;border:none;border-radius:8px;cursor:pointer;font-size:14px;"><i class="fas fa-arrow-right"></i> 直接进入检验</button></div>`);
     }
 
-    const knowledgeName = feynmanResult?.data?.knowledge_name || state.currentKnowledge?.name || '当前知识点';
-    document.getElementById('socraticText').textContent = `📚 ${knowledgeName} | 掌握度：${masteryPercent}%`;
+    const userInput = document.getElementById('userInput');
+    userInput.placeholder = phase === 'interactive' ? '输入你的问题，或输入「学习好了」...' : '输入你的回答...';
+    updatePhaseDisplay();
 }
 
 // ========================================
@@ -996,6 +1076,135 @@ function refreshQuestionBank() {
 }
 
 // ========================================
+// 知识点管理
+// ========================================
+
+let currentManageTab = 'questions';
+
+function initManageTabs() {
+    const tabs = document.querySelectorAll('.manage-tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            currentManageTab = tab.dataset.tab;
+            if (currentManageTab === 'knowledge') {
+                document.getElementById('knowledgeManageSection').style.display = 'block';
+                loadKnowledgeManageList();
+            } else {
+                document.getElementById('knowledgeManageSection').style.display = 'none';
+            }
+        });
+    });
+}
+
+async function loadKnowledgeManageList() {
+    const result = await api.getKnowledgePoints();
+    const list = document.getElementById('knowledgeManageList');
+    if (!result || !result.data || result.data.length === 0) {
+        list.innerHTML = '<p class="empty-hint">暂无知识点数据</p>';
+        return;
+    }
+
+    let html = '<table class="knowledge-table"><thead><tr><th>编码</th><th>名称</th><th>章节</th><th>阶段</th><th>状态</th><th>操作</th></tr></thead><tbody>';
+    result.data.forEach(kp => {
+        const statusClass = kp.status === 'completed' ? 'completed' : kp.status === 'unlocked' ? 'unlocked' : 'locked';
+        html += `<tr>
+            <td>${kp.code}</td>
+            <td>${kp.name}</td>
+            <td>${kp.chapter || '-'}</td>
+            <td>${kp.stage || '-'}</td>
+            <td><span class="status-badge ${statusClass}">${kp.status === 'completed' ? '已完成' : kp.status === 'unlocked' ? '已解锁' : '锁定'}</span></td>
+            <td class="action-cell">
+                <button class="btn btn-sm btn-outline" onclick="editKnowledgePoint(${kp.id})"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-sm btn-danger" onclick="deleteKnowledgePoint(${kp.id})"><i class="fas fa-trash"></i></button>
+            </td>
+        </tr>`;
+    });
+    html += '</tbody></table>';
+    list.innerHTML = html;
+}
+
+function showAddKnowledgeForm() {
+    document.getElementById('knowledgeFormCard').style.display = 'block';
+    document.getElementById('knowledgeFormTitle').innerHTML = '<i class="fas fa-plus"></i> 添加知识点';
+    document.getElementById('kpEditId').value = '';
+    document.getElementById('knowledgeForm').reset();
+}
+
+function hideKnowledgeForm() {
+    document.getElementById('knowledgeFormCard').style.display = 'none';
+}
+
+async function editKnowledgePoint(id) {
+    const result = await api.request(`/knowledge/code?kp_id=${id}`);
+    if (!result || result.error) {
+        const allResult = await api.getKnowledgePoints();
+        const kp = allResult?.data?.find(k => k.id === id);
+        if (kp) fillKnowledgeForm(kp);
+    } else {
+        fillKnowledgeForm(result);
+    }
+}
+
+function fillKnowledgeForm(kp) {
+    document.getElementById('knowledgeFormCard').style.display = 'block';
+    document.getElementById('knowledgeFormTitle').innerHTML = '<i class="fas fa-edit"></i> 编辑知识点';
+    document.getElementById('kpEditId').value = kp.id;
+    document.getElementById('kpCode').value = kp.code || '';
+    document.getElementById('kpName').value = kp.name || '';
+    document.getElementById('kpChapter').value = kp.chapter || '';
+    document.getElementById('kpStage').value = kp.stage || '';
+    document.getElementById('kpSortOrder').value = kp.sort_order || 0;
+    document.getElementById('kpStatus').value = kp.status || 'locked';
+}
+
+async function saveKnowledgePoint(event) {
+    event.preventDefault();
+    const editId = document.getElementById('kpEditId').value;
+    const data = {
+        code: document.getElementById('kpCode').value,
+        name: document.getElementById('kpName').value,
+        chapter: document.getElementById('kpChapter').value,
+        stage: document.getElementById('kpStage').value,
+        sort_order: parseInt(document.getElementById('kpSortOrder').value) || 0,
+        status: document.getElementById('kpStatus').value
+    };
+
+    let result;
+    if (editId) {
+        result = await api.request(`/knowledge/${editId}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    } else {
+        result = await api.request('/knowledge', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    }
+
+    if (result && (result.message || result.id)) {
+        showToast(editId ? '更新成功' : '创建成功', 'success');
+        hideKnowledgeForm();
+        loadKnowledgeManageList();
+    } else {
+        showToast(result?.detail || '操作失败', 'error');
+    }
+}
+
+async function deleteKnowledgePoint(id) {
+    if (!confirm('确定要删除这个知识点吗？')) return;
+    const result = await api.request(`/knowledge/${id}`, { method: 'DELETE' });
+    if (result && result.message) {
+        showToast('删除成功', 'success');
+        loadKnowledgeManageList();
+    } else {
+        showToast(result?.detail || '删除失败', 'error');
+    }
+}
+
+// ========================================
 // 初始化
 // ========================================
 document.addEventListener('DOMContentLoaded', () => {
@@ -1004,6 +1213,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initStageTabs();
     initChat();
     initUpload();
+    initManageTabs();
     navigateTo('map');
     console.log('AI伴学系统界面已加载');
 });

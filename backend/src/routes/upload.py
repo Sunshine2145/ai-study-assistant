@@ -35,7 +35,7 @@ async def upload_questions(
     use_ai_parse: bool = False,
     ai_provider: str = "deepseek"
 ):
-    """上传题库文件（支持TXT、JSON、MD和PDF格式）"""
+    """上传题库文件（支持TXT、JSON、MD、PDF、DOCX、XLSX格式）"""
     if not file.filename:
         raise HTTPException(status_code=400, detail="文件名为空")
 
@@ -78,8 +78,22 @@ async def upload_questions(
             else:
                 # 使用正则解析PDF文本
                 questions = _parse_pdf_text(text)
+        elif filename.endswith('.docx'):
+            # Word文档解析
+            text = _parse_docx_content(content)
+            if use_ai_parse:
+                questions = await _parse_pdf_with_ai(text, ai_provider)
+            else:
+                questions = _parse_txt_format(text)
+        elif filename.endswith(('.xlsx', '.xls')):
+            # Excel文件解析
+            text = _parse_excel_content(content)
+            if use_ai_parse:
+                questions = await _parse_pdf_with_ai(text, ai_provider)
+            else:
+                questions = _parse_txt_format(text)
         else:
-            raise HTTPException(status_code=400, detail="不支持的文件格式，请上传 .txt、.json、.md 或 .pdf 文件")
+            raise HTTPException(status_code=400, detail="不支持的文件格式，请上传 .txt、.json、.md、.pdf、.docx 或 .xlsx 文件")
 
         if not questions:
             return {"success": True, "imported": 0, "message": "未找到有效题目"}
@@ -215,6 +229,50 @@ async def _parse_pdf_with_ai(text: str, ai_provider: str = "deepseek") -> list:
         )
     questions = await parser.parse(text)
     return questions
+
+
+def _parse_docx_content(content: bytes) -> str:
+    """从DOCX中提取文本内容"""
+    from docx import Document
+    import io
+
+    text_parts = []
+    try:
+        doc = Document(io.BytesIO(content))
+        for para in doc.paragraphs:
+            if para.text.strip():
+                text_parts.append(para.text)
+        for table in doc.tables:
+            for row in table.rows:
+                row_text = " | ".join(cell.text.strip() for cell in row.cells if cell.text.strip())
+                if row_text:
+                    text_parts.append(row_text)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"DOCX解析失败：{str(e)}")
+
+    return "\n\n".join(text_parts)
+
+
+def _parse_excel_content(content: bytes) -> str:
+    """从Excel中提取文本内容"""
+    from openpyxl import load_workbook
+    import io
+
+    text_parts = []
+    try:
+        wb = load_workbook(io.BytesIO(content), read_only=True, data_only=True)
+        for sheet_name in wb.sheetnames:
+            sheet = wb[sheet_name]
+            text_parts.append(f"=== {sheet_name} ===")
+            for row in sheet.iter_rows(values_only=True):
+                row_text = " | ".join(str(cell) for cell in row if cell is not None)
+                if row_text.strip():
+                    text_parts.append(row_text)
+        wb.close()
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Excel解析失败：{str(e)}")
+
+    return "\n\n".join(text_parts)
 
 
 def _parse_pdf_text(text: str) -> list:
@@ -363,6 +421,6 @@ async def get_import_template():
             "answer": "答案，单选/判断为选项字母或true/false，多选为字母数组",
             "analysis": "解析（可选）"
         },
-        "supported_formats": [".json", ".txt", ".md", ".pdf"]
+        "supported_formats": [".json", ".txt", ".md", ".pdf", ".docx", ".xlsx"]
     }
     return template

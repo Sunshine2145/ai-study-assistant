@@ -16,6 +16,10 @@ aiohttp==3.9.1
 # PDF Processing
 PyMuPDF==1.23.8
 
+# Document Processing
+python-docx>=0.8.11
+openpyxl>=3.1.0
+
 # Scheduling
 APScheduler==3.10.4
 
