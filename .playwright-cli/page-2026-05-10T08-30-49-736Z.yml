@@ -1,0 +1,89 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - generic [ref=e6]: 
+          - generic [ref=e7]: AI伴学
+        - text: 
+      - navigation [ref=e8]:
+        - link " 学习首页" [ref=e9] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e10]: 
+          - generic [ref=e11]: 学习首页
+        - link " 学习地图" [ref=e12] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e13]: 
+          - generic [ref=e14]: 学习地图
+        - link " 开始学习" [ref=e15] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e16]: 
+          - generic [ref=e17]: 开始学习
+        - link " 题目练习" [ref=e18] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e19]: 
+          - generic [ref=e20]: 题目练习
+        - link " 错题本" [ref=e21] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e22]: 
+          - generic [ref=e23]: 错题本
+        - link " 学习报告" [ref=e24] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e25]: 
+          - generic [ref=e26]: 学习报告
+        - link " 题库上传" [ref=e27] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e28]: 
+          - generic [ref=e29]: 题库上传
+        - link " 题库管理" [ref=e30] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e31]: 
+          - generic [ref=e32]: 题库管理
+        - link " AI问答" [ref=e33] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e34]: 
+          - generic [ref=e35]: AI问答
+        - link " 用户管理" [active] [ref=e65] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e66]: 
+          - text: 用户管理
+      - generic [ref=e37]:
+        - generic [ref=e39]: 
+        - generic [ref=e40]:
+          - generic [ref=e41]: 谭晓磊
+          - generic [ref=e42]:
+            - generic [ref=e43]:
+              - generic [ref=e44]: 
+              - text: 0天
+            - generic [ref=e45]:
+              - generic [ref=e46]: 
+              - text: 0分
+    - main [ref=e47]:
+      - generic [ref=e48]:
+        - text: 
+        - generic [ref=e49]: 用户管理
+        - generic [ref=e50]:
+          - button " 0" [ref=e51] [cursor=pointer]:
+            - generic [ref=e52]: 
+            - generic [ref=e53]: "0"
+          - button "" [ref=e54] [cursor=pointer]:
+            - generic [ref=e55]: 
+      - generic [ref=e56]:                                                                                                   + +      
+  - generic [ref=e357]:
+    - heading " 用户管理" [level=2] [ref=e359]:
+      - generic [ref=e360]: 
+      - text: 用户管理
+    - generic [ref=e362]:
+      - generic [ref=e363]:
+        - generic [ref=e364]: 谭
+        - generic [ref=e365]:
+          - generic [ref=e366]: 谭晓磊
+          - generic [ref=e367]: "-"
+      - generic [ref=e368]: 管理员 正常
+      - generic [ref=e369]:
+        - generic [ref=e370]: 积分 0
+        - generic [ref=e371]: 连续学习 0天
+      - generic [ref=e372]:
+        - button "编辑" [ref=e373] [cursor=pointer]
+        - button "禁用" [ref=e374] [cursor=pointer]
+  - text:       

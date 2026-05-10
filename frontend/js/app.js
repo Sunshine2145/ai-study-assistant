@@ -42,7 +42,7 @@ const api = {
         }
     },
 
-    async getUser() { return await this.request('/user/current'); },
+    async getUser() { return await this.request('/auth/current'); },
     async getLearningStatus() { return await this.request('/learning/status'); },
     async getKnowledgePoints(stage = null) {
         const url = stage ? `/knowledge?stage=${stage}` : '/knowledge';
@@ -128,6 +128,50 @@ const api = {
     async resetLearning() { return await this.request('/learning/reset', { method: 'POST' }); },
     async getFeynmanContent(knowledgeId) {
         return await this.request(`/learning/feynman/${knowledgeId}`);
+    },
+    // 用户管理
+    async login(username, password) {
+        return await this.request('/auth/login', {
+            method: 'POST',
+            body: JSON.stringify({ username, password })
+        });
+    },
+    async register(username, password, nickname) {
+        return await this.request('/auth/register', {
+            method: 'POST',
+            body: JSON.stringify({ username, password, nickname })
+        });
+    },
+    async logout() {
+        return await this.request('/auth/logout', { method: 'POST' });
+    },
+    async getUserList() {
+        return await this.request('/admin/users/list');
+    },
+    async getUserById(userId) {
+        return await this.request(`/admin/users/${userId}`);
+    },
+    async updateUser(userId, data) {
+        return await this.request(`/admin/users/${userId}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    },
+    async updateUserPermissions(userId, permissions) {
+        return await this.request(`/admin/users/${userId}/permissions`, {
+            method: 'PUT',
+            body: JSON.stringify({ user_id: userId, permissions })
+        });
+    },
+    async banUser(userId) {
+        return await this.request(`/admin/users/${userId}/ban`, { method: 'POST' });
+    },
+    async unbanUser(userId) {
+        return await this.request(`/admin/users/${userId}/unban`, { method: 'POST' });
+    },
+    // 上传进度
+    async getUploadProgress(uploadId) {
+        return await this.request(`/upload/progress/${uploadId}`);
     }
 };
 
@@ -147,12 +191,18 @@ function navigateTo(page) {
     const activeNav = document.querySelector(`.nav-item[data-page="${page}"]`);
     if (activeNav) activeNav.classList.add('active');
 
-    const pageTitles = { 'home': '学习首页', 'learn': '开始学习', 'map': '学习地图', 'practice': '题目练习', 'wrong': '错题本', 'report': '学习报告', 'upload': '题库上传', 'question-bank': '题库管理', 'ai-qa': 'AI问答' };
+    const pageTitles = { 'home': '学习首页', 'learn': '开始学习', 'map': '学习地图', 'practice': '题目练习', 'wrong': '错题本', 'report': '学习报告', 'upload': '题库上传', 'question-bank': '题库管理', 'ai-qa': 'AI问答', 'user-management': '用户管理', 'login': '登录', 'register': '注册' };
     const pageTitle = document.getElementById('pageTitle');
     if (pageTitle && pageTitles[page]) pageTitle.textContent = pageTitles[page];
 
     const sidebar = document.getElementById('sidebar');
-    if (window.innerWidth <= 1024) sidebar.classList.remove('open');
+    // Hide sidebar for login/register pages
+    if (page === 'login' || page === 'register') {
+        sidebar.style.display = 'none';
+    } else {
+        sidebar.style.display = 'flex';
+        if (window.innerWidth <= 1024) sidebar.classList.remove('open');
+    }
 
     loadPageData(page);
 }
@@ -170,6 +220,7 @@ async function loadPageData(page) {
         case 'report': await loadReportData(); break;
         case 'upload': await loadUploadData(); break;
         case 'question-bank': await loadQuestionBankData(); break;
+        case 'user-management': await loadUserManagementData(); break;
     }
 }
 
@@ -858,6 +909,22 @@ async function handleFileUpload(file) {
         return;
     }
 
+    // 显示进度
+    const uploadProgress = document.getElementById('uploadProgress');
+    const progressStage = document.getElementById('progressStage');
+    const progressFill = document.getElementById('progressFill');
+    const progressPercent = document.getElementById('progressPercent');
+    const progressCount = document.getElementById('progressCount');
+    const uploadResult = document.getElementById('uploadResult');
+    const fileInput = document.getElementById('fileInput');
+
+    uploadProgress.style.display = 'block';
+    uploadResult.style.display = 'none';
+    progressStage.textContent = '正在上传文件...';
+    progressFill.style.width = '10%';
+    progressPercent.textContent = '10%';
+    progressCount.textContent = '0 / 0 题';
+
     const formData = new FormData();
     formData.append('file', file);
 
@@ -872,7 +939,6 @@ async function handleFileUpload(file) {
     const aiProvider = document.getElementById('aiProvider')?.value || 'deepseek';
     const result = await api.uploadQuestions(formData, useAiParse, aiProvider);
 
-    const uploadResult = document.getElementById('uploadResult');
     const resultMessage = document.getElementById('resultMessage');
     const totalFound = document.getElementById('totalFound');
     const importedCount = document.getElementById('importedCount');
@@ -881,12 +947,14 @@ async function handleFileUpload(file) {
     fileInput.value = '';
 
     if (result && result.success) {
+        uploadProgress.style.display = 'none';
         uploadResult.style.display = 'block';
         resultMessage.textContent = '上传成功！';
         totalFound.textContent = result.total_found || 0;
         importedCount.textContent = result.imported || 0;
         showToast(result.message || '导入成功', 'success');
     } else {
+        uploadProgress.style.display = 'none';
         uploadResult.style.display = 'block';
         resultMessage.textContent = result.message || '上传失败';
         totalFound.textContent = result.total_found || 0;
@@ -1380,16 +1448,159 @@ document.addEventListener('DOMContentLoaded', () => {
     initQAChat();
     initUpload();
     initManageTabs();
-    loadUserInfo();
-    navigateTo('map');
+    // 首次访问跳转到登录页面
+    navigateTo('login');
     console.log('AI伴学系统界面已加载');
 });
 
 async function loadUserInfo() {
-    const user = await api.getUser();
-    if (user && user.nickname) {
-        document.getElementById('userName').textContent = user.nickname;
-    } else {
+    try {
+        const user = await api.getUser();
+        if (user && (user.nickname || user.username)) {
+            document.getElementById('userName').textContent = user.nickname || user.username;
+            // Show user management nav for admin role
+            showUserManagementNav(user.role);
+        } else {
+            document.getElementById('userName').textContent = '学员';
+        }
+    } catch (e) {
         document.getElementById('userName').textContent = '学员';
+    }
+}
+
+// 登录
+async function doLogin() {
+    const username = document.getElementById('loginUsername').value.trim();
+    const password = document.getElementById('loginPassword').value;
+
+    if (!username || !password) {
+        alert('请输入用户名和密码');
+        return;
+    }
+
+    console.log('Logging in with:', username);
+    const result = await api.login(username, password);
+    console.log('Login result:', result);
+    if (result && result.user_id) {
+        localStorage.setItem('user', JSON.stringify(result));
+        loadUserInfo();
+        navigateTo('map');
+    } else {
+        alert(result?.detail || '登录失败');
+    }
+}
+
+// 注册
+async function doRegister() {
+    const username = document.getElementById('registerUsername').value.trim();
+    const password = document.getElementById('registerPassword').value;
+    const confirmPassword = document.getElementById('registerConfirmPassword').value;
+    const nickname = document.getElementById('registerNickname').value.trim();
+
+    if (!username || !password) {
+        alert('请输入用户名和密码');
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        alert('两次密码输入不一致');
+        return;
+    }
+
+    const result = await api.register(username, password, nickname || username);
+    if (result && result.success) {
+        alert('注册成功，请登录');
+        showLogin();
+    } else {
+        alert(result?.message || '注册失败');
+    }
+}
+
+function showRegister() {
+    navigateTo('register');
+}
+
+function showLogin() {
+    navigateTo('login');
+}
+
+// 用户管理页面加载
+async function loadUserManagementData() {
+    const userListEl = document.getElementById('userList');
+    if (!userListEl) return;
+
+    const users = await api.getUserList();
+    if (!users || !users.data) {
+        userListEl.innerHTML = '<p class="empty-hint">加载失败</p>';
+        return;
+    }
+
+    if (users.data.length === 0) {
+        userListEl.innerHTML = '<p class="empty-hint">暂无用户</p>';
+        return;
+    }
+
+    userListEl.innerHTML = users.data.map(user => `
+        <div class="user-card">
+            <div class="user-info">
+                <div class="user-avatar">${(user.nickname || user.username).charAt(0).toUpperCase()}</div>
+                <div class="user-details">
+                    <div class="user-name">${user.nickname || user.username}</div>
+                    <div class="user-email">${user.email || '-'}</div>
+                </div>
+            </div>
+            <div class="user-meta">
+                <span class="user-role badge-${user.role}">${user.role === 'admin' ? '管理员' : '用户'}</span>
+                <span class="user-status badge-${user.status}">${user.status === 'active' ? '正常' : '禁用'}</span>
+            </div>
+            <div class="user-stats">
+                <div class="stat-item">
+                    <span class="stat-label">积分</span>
+                    <span class="stat-value">${user.score || 0}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">连续学习</span>
+                    <span class="stat-value">${user.streak || 0}天</span>
+                </div>
+            </div>
+            <div class="user-actions">
+                <button class="btn btn-sm btn-outline" onclick="editUser(${user.id})">编辑</button>
+                ${user.status === 'active'
+                    ? `<button class="btn btn-sm btn-outline" onclick="toggleUserStatus(${user.id}, 'ban')">禁用</button>`
+                    : `<button class="btn btn-sm btn-primary" onclick="toggleUserStatus(${user.id}, 'unban')">启用</button>`
+                }
+            </div>
+        </div>
+    `).join('');
+}
+
+async function editUser(userId) {
+    const user = await api.getUserById(userId);
+    if (!user) {
+        alert('用户不存在');
+        return;
+    }
+
+    const newNickname = prompt('请输入新的昵称:', user.nickname || '');
+    if (newNickname === null) return;
+
+    await api.updateUser(userId, { nickname: newNickname });
+    loadUserManagementData();
+}
+
+async function toggleUserStatus(userId, action) {
+    const confirmMsg = action === 'ban' ? '确定要禁用此用户吗？' : '确定要启用此用户吗？';
+    if (!confirm(confirmMsg)) return;
+
+    const result = action === 'ban' ? await api.banUser(userId) : await api.unbanUser(userId);
+    if (result && result.message) {
+        loadUserManagementData();
+    }
+}
+
+function showUserManagementNav(role) {
+    const nav = document.getElementById('userManagementNav');
+    if (nav) {
+        nav.style.display = role === 'admin' ? 'block' : 'none';
     }
 }

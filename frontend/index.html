@@ -60,6 +60,10 @@
                     <i class="fas fa-comments"></i>
                     <span>AI问答</span>
                 </a>
+                <a href="#" class="nav-item" data-page="user-management" id="userManagementNav" style="display: none;">
+                    <i class="fas fa-users"></i>
+                    <span>用户管理</span>
+                </a>
             </nav>
 
             <div class="sidebar-footer">
@@ -438,6 +442,21 @@
                                     <p>成功导入 <strong id="importedCount">0</strong> 道题目</p>
                                 </div>
                             </div>
+
+                            <!-- 上传进度显示 -->
+                            <div class="upload-progress" id="uploadProgress" style="display: none;">
+                                <div class="progress-header">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    <span id="progressStage">正在上传文件...</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+                                </div>
+                                <div class="progress-text">
+                                    <span id="progressPercent">0%</span>
+                                    <span id="progressCount">0 / 0 题</span>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="card format-info">
@@ -648,6 +667,79 @@
         </main>
     </div>
 
+    <!-- 用户管理页面（仅管理员可见） -->
+            <div class="page" id="page-user-management" style="display: none;">
+                <div class="user-management-container">
+                    <div class="page-header">
+                        <h2><i class="fas fa-users"></i> 用户管理</h2>
+                    </div>
+                    <div class="user-list" id="userList">
+                        <p class="empty-hint">加载中...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 登录页面 -->
+            <div class="page" id="page-login" style="display: none;">
+                <div class="login-container">
+                    <div class="login-card">
+                        <div class="login-header">
+                            <i class="fas fa-robot"></i>
+                            <h2>AI伴学系统</h2>
+                            <p>智能备考助手</p>
+                        </div>
+                        <div class="login-form">
+                            <div class="form-group">
+                                <label>用户名</label>
+                                <input type="text" id="loginUsername" placeholder="请输入用户名">
+                            </div>
+                            <div class="form-group">
+                                <label>密码</label>
+                                <input type="password" id="loginPassword" placeholder="请输入密码">
+                            </div>
+                            <button class="btn btn-primary btn-block" onclick="doLogin()">登录</button>
+                            <div class="login-links">
+                                <a href="#" onclick="showRegister()">注册新账号</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 注册页面 -->
+            <div class="page" id="page-register" style="display: none;">
+                <div class="login-container">
+                    <div class="login-card">
+                        <div class="login-header">
+                            <i class="fas fa-user-plus"></i>
+                            <h2>用户注册</h2>
+                        </div>
+                        <div class="login-form">
+                            <div class="form-group">
+                                <label>用户名</label>
+                                <input type="text" id="regUsername" placeholder="请输入用户名">
+                            </div>
+                            <div class="form-group">
+                                <label>密码</label>
+                                <input type="password" id="regPassword" placeholder="请输入密码">
+                            </div>
+                            <div class="form-group">
+                                <label>昵称（可选）</label>
+                                <input type="text" id="regNickname" placeholder="请输入昵称">
+                            </div>
+                            <div class="form-group">
+                                <label>邮箱（可选）</label>
+                                <input type="email" id="regEmail" placeholder="请输入邮箱">
+                            </div>
+                            <button class="btn btn-primary btn-block" onclick="doRegister()">注册</button>
+                            <div class="login-links">
+                                <a href="#" onclick="showLogin()">已有账号？立即登录</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
     <!-- 知识卡片弹窗 -->
     <div class="knowledge-card-modal" id="knowledgeCardModal" style="display: none;">
         <div class="knowledge-card">
@@ -681,6 +773,6 @@
         </div>
     </div>
 
-    <script src="js/app.js?v=1.5.1"></script>
+    <script src="js/app.js?v=1.5.6"></script>
 </body>
 </html>

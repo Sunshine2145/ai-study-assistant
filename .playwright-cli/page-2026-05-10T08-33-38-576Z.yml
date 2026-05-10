@@ -1,0 +1,85 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - generic [ref=e6]: 
+          - generic [ref=e7]: AI伴学
+        - text: 
+      - navigation [ref=e8]:
+        - link " 学习首页" [ref=e9] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e10]: 
+          - generic [ref=e11]: 学习首页
+        - link " 学习地图" [ref=e12] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e13]: 
+          - generic [ref=e14]: 学习地图
+        - link " 开始学习" [ref=e15] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e16]: 
+          - generic [ref=e17]: 开始学习
+        - link " 题目练习" [ref=e18] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e19]: 
+          - generic [ref=e20]: 题目练习
+        - link " 错题本" [ref=e21] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e22]: 
+          - generic [ref=e23]: 错题本
+        - link " 学习报告" [ref=e24] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e25]: 
+          - generic [ref=e26]: 学习报告
+        - link " 题库上传" [ref=e27] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e28]: 
+          - generic [ref=e29]: 题库上传
+        - link " 题库管理" [ref=e30] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e31]: 
+          - generic [ref=e32]: 题库管理
+        - link " AI问答" [ref=e33] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e34]: 
+          - generic [ref=e35]: AI问答
+        - text: 
+      - generic [ref=e37]:
+        - generic [ref=e39]: 
+        - generic [ref=e40]:
+          - generic [ref=e41]: 加载中...
+          - generic [ref=e42]:
+            - generic [ref=e43]:
+              - generic [ref=e44]: 
+              - text: 0天
+            - generic [ref=e45]:
+              - generic [ref=e46]: 
+              - text: 0分
+    - main [ref=e47]:
+      - generic [ref=e48]:
+        - text: 
+        - generic [ref=e49]: 登录
+        - generic [ref=e50]:
+          - button " 0" [ref=e51] [cursor=pointer]:
+            - generic [ref=e52]: 
+            - generic [ref=e53]: "0"
+          - button "" [ref=e54] [cursor=pointer]:
+            - generic [ref=e55]: 
+      - generic [ref=e56]:                                     + +      
+  - text: 
+  - generic [ref=e59]:
+    - generic [ref=e60]:
+      - generic [ref=e61]: 
+      - heading "AI伴学系统" [level=2] [ref=e62]
+      - paragraph [ref=e63]: 智能备考助手
+    - generic [ref=e64]:
+      - generic [ref=e65]:
+        - generic [ref=e66]: 用户名
+        - textbox "请输入用户名" [ref=e67]: tanxiaolei
+      - generic [ref=e68]:
+        - generic [ref=e69]: 密码
+        - textbox "请输入密码" [active] [ref=e70]: admin123
+      - button "登录" [ref=e71] [cursor=pointer]
+      - link "注册新账号" [ref=e73] [cursor=pointer]:
+        - /url: "#"
+  - text:      

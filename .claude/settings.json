@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm list *)",
+      "Bash(npx -y @mcp-b/chrome-devtools-mcp --version)",
+      "Bash(npx @mcp-b/chrome-devtools-mcp --help)",
+      "Bash(npm info *)",
+      "Bash(npx chrome-mcp *)",
+      "Bash(npm ls *)",
+      "Bash(node -e \"const fs=require\\('fs'\\); const d=JSON.parse\\(fs.readFileSync\\('C:/Users/pc/.claude/settings.json','utf8'\\)\\); console.log\\(JSON.stringify\\(d, null, 2\\)\\)\")"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\pc"
+    ]
+  }
+}

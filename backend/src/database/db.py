@@ -280,4 +280,63 @@ def init_database():
         )
     """)
 
+    # Add new columns for user management (migration for existing database)
+    # Note: feishu columns kept for backwards compatibility
+    try:
+        db.execute("ALTER TABLE users ADD COLUMN username VARCHAR(50) UNIQUE")
+    except:
+        pass
+    try:
+        db.execute("ALTER TABLE users ADD COLUMN password_hash VARCHAR(255)")
+    except:
+        pass
+    try:
+        db.execute("ALTER TABLE users ADD COLUMN email VARCHAR(255)")
+    except:
+        pass
+    try:
+        db.execute("ALTER TABLE users ADD COLUMN role VARCHAR(20) DEFAULT 'user'")
+    except:
+        pass
+    try:
+        db.execute("ALTER TABLE users ADD COLUMN permissions TEXT")
+    except:
+        pass
+    try:
+        db.execute("ALTER TABLE users ADD COLUMN status VARCHAR(20) DEFAULT 'active'")
+    except:
+        pass
+
+    # User permissions table
+    db.execute("""
+        CREATE TABLE IF NOT EXISTS user_permissions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            module VARCHAR(50) NOT NULL,
+            granted_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            granted_by INTEGER,
+            FOREIGN KEY (user_id) REFERENCES users(id),
+            UNIQUE(user_id, module)
+        )
+    """)
+
+    # Upload progress table
+    db.execute("""
+        CREATE TABLE IF NOT EXISTS upload_progress (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            file_name VARCHAR(255),
+            file_size INTEGER,
+            status VARCHAR(20) DEFAULT 'pending',
+            progress INTEGER DEFAULT 0,
+            stage VARCHAR(50),
+            total_questions INTEGER DEFAULT 0,
+            processed_questions INTEGER DEFAULT 0,
+            error_message TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+    """)
+
     logger.info("Database initialized successfully")

@@ -7,6 +7,7 @@ from loguru import logger
 from src.config.settings import settings
 from src.modules.feishu.bot import router as feishu_router
 from src.routes import user, learning, knowledge, chat, questions, answers, wrong_questions, report, reminders, upload, question_bank, ai_qa
+from src.routes import auth, admin_user, upload_progress
 
 app = FastAPI(title="AI伴学系统", version="1.0.0")
 
@@ -21,6 +22,9 @@ app.add_middleware(
 
 # Include routers
 app.include_router(feishu_router, prefix="/feishu", tags=["飞书"])
+app.include_router(auth.router)
+app.include_router(admin_user.router)
+app.include_router(upload_progress.router)
 app.include_router(user.router)
 app.include_router(learning.router)
 app.include_router(knowledge.router)

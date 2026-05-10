@@ -300,6 +300,26 @@ body {
     display: block;
 }
 
+/* 登录/注册页面层级 */
+#page-login,
+#page-register {
+    z-index: 200;
+    position: relative;
+}
+
+#page-login.active,
+#page-register.active {
+    z-index: 200;
+}
+
+/* 登录/注册页面隐藏侧边栏 */
+#page-login.active ~ .sidebar,
+#page-register.active ~ .sidebar,
+#page-login.active + .sidebar,
+#page-register.active + .sidebar {
+    display: none;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -1800,6 +1820,50 @@ body {
     background: var(--success-light);
     border-radius: var(--radius-md);
     border-left: 4px solid var(--success);
+}
+
+/* 上传进度样式 */
+.upload-progress {
+    margin-top: var(--spacing-lg);
+    padding: var(--spacing-md);
+    background: var(--info-light);
+    border-radius: var(--radius-md);
+    border-left: 4px solid var(--primary);
+}
+
+.progress-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    color: var(--primary);
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+}
+
+.progress-header i {
+    font-size: 16px;
+}
+
+.progress-bar {
+    height: 8px;
+    background: var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: var(--spacing-sm);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--success));
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
 }
 
 .result-header {
