@@ -6,7 +6,7 @@
 // ========================================
 // 配置
 // ========================================
-const API_BASE = 'http://localhost:8081/api';
+const API_BASE = 'http://localhost:10088/api';
 
 // ========================================
 // 状态管理
@@ -575,7 +575,11 @@ function addAIMessage(text) {
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-function formatText(text) { return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>'); }
+function formatText(text) {
+    return text
+        .replace(/\*\*(.*?)\*\*/g, '<span class="knowledge-tag" onclick="showKnowledgeCard(\'$1\')">$1</span>')
+        .replace(/\n/g, '<br>');
+}
 function getCurrentTime() { return new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }); }
 
 async function startLearn(code) {
@@ -1223,6 +1227,148 @@ async function deleteKnowledgePoint(id) {
 }
 
 // ========================================
+// AI问答模块
+// ========================================
+async function sendQAMessage() {
+    const qaUserInput = document.getElementById('qaUserInput');
+    const text = qaUserInput.value.trim();
+    if (!text) return;
+
+    addQAUserMessage(text);
+    qaUserInput.value = '';
+
+    // 显示加载提示
+    addQAIMessage('正在思考中...');
+
+    const result = await api.request('/ai-qa/chat', {
+        method: 'POST',
+        body: JSON.stringify({
+            question: text,
+            current_knowledge_id: state.currentKnowledge?.id
+        })
+    });
+
+    // 移除加载提示
+    const qaChatMessages = document.getElementById('qaChatMessages');
+    if (qaChatMessages.lastChild) {
+        qaChatMessages.removeChild(qaChatMessages.lastChild);
+    }
+
+    if (result && result.data) {
+        addQAIMessage(result.data.response);
+    } else {
+        setTimeout(() => {
+            addQAIMessage('AI服务暂时不可用，请稍后重试。');
+        }, 500);
+    }
+}
+
+function addQAUserMessage(text) {
+    const qaChatMessages = document.getElementById('qaChatMessages');
+    const div = document.createElement('div');
+    div.className = 'message user-message';
+    div.innerHTML = `<div class="message-content"><div class="message-text">${formatText(text)}</div><div class="message-time">${getCurrentTime()}</div></div><div class="message-avatar"><i class="fas fa-user"></i></div>`;
+    qaChatMessages.appendChild(div);
+    qaChatMessages.scrollTop = qaChatMessages.scrollHeight;
+}
+
+function addQAIMessage(text) {
+    const qaChatMessages = document.getElementById('qaChatMessages');
+    const div = document.createElement('div');
+    div.className = 'message ai-message';
+    div.innerHTML = `<div class="message-avatar"><i class="fas fa-robot"></i></div><div class="message-content"><div class="message-sender">AI伴学助手</div><div class="message-text">${formatText(text)}</div><div class="message-time">${getCurrentTime()}</div></div>`;
+    qaChatMessages.appendChild(div);
+    qaChatMessages.scrollTop = qaChatMessages.scrollHeight;
+}
+
+function initQAChat() {
+    const qaSendBtn = document.getElementById('qaSendBtn');
+    const qaUserInput = document.getElementById('qaUserInput');
+    if (qaSendBtn && qaUserInput) {
+        qaSendBtn.addEventListener('click', () => sendQAMessage());
+        qaUserInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendQAMessage();
+            }
+        });
+    }
+}
+
+// ========================================
+// 知识卡片功能
+// ========================================
+async function showKnowledgeCard(term) {
+    const modal = document.getElementById('knowledgeCardModal');
+    const titleEl = document.getElementById('cardTitle');
+    const definitionEl = document.getElementById('cardDefinition');
+    const exampleEl = document.getElementById('cardExample');
+    const relatedEl = document.getElementById('cardRelated');
+    const questionsEl = document.getElementById('cardQuestions');
+    const relatedSection = document.getElementById('relatedSection');
+    const questionsSection = document.getElementById('questionsSection');
+
+    // 显示弹窗并设置加载状态
+    titleEl.textContent = term;
+    definitionEl.textContent = '加载中...';
+    exampleEl.textContent = '加载中...';
+    relatedEl.innerHTML = '';
+    questionsEl.innerHTML = '';
+    modal.style.display = 'flex';
+
+    // 调用API获取知识点详情
+    const result = await api.request(`/ai-qa/knowledge-card/${encodeURIComponent(term)}`);
+
+    if (result && result.data) {
+        const data = result.data;
+        titleEl.textContent = data.term || term;
+        definitionEl.textContent = data.definition || '暂无定义';
+        exampleEl.textContent = data.example || '暂无示例';
+
+        // 显示关联知识
+        if (data.related_knowledge && data.related_knowledge.length > 0) {
+            relatedSection.style.display = 'block';
+            relatedEl.innerHTML = data.related_knowledge.map(k =>
+                `<div class="related-item">
+                    <span class="related-name">${k.name}</span>
+                    <span class="related-status ${k.status}">${k.status === 'completed' ? '已学习' : '待学习'}</span>
+                </div>`
+            ).join('');
+        } else {
+            relatedSection.style.display = 'none';
+        }
+
+        // 显示相关题目
+        if (data.related_questions && data.related_questions.length > 0) {
+            questionsSection.style.display = 'block';
+            questionsEl.innerHTML = data.related_questions.map(q =>
+                `<div class="related-question">${q}</div>`
+            ).join('');
+        } else {
+            questionsSection.style.display = 'none';
+        }
+    } else {
+        definitionEl.textContent = '暂无详细信息';
+        exampleEl.textContent = '';
+        relatedSection.style.display = 'none';
+        questionsSection.style.display = 'none';
+    }
+}
+
+function closeKnowledgeCard() {
+    const modal = document.getElementById('knowledgeCardModal');
+    modal.style.display = 'none';
+}
+
+// 点击弹窗外部关闭
+document.addEventListener('click', (e) => {
+    const modal = document.getElementById('knowledgeCardModal');
+    if (e.target === modal) {
+        closeKnowledgeCard();
+    }
+});
+
+// ========================================
 // 初始化
 // ========================================
 document.addEventListener('DOMContentLoaded', () => {
@@ -1230,6 +1376,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initPractice();
     initStageTabs();
     initChat();
+    initQAChat();
     initUpload();
     initManageTabs();
     navigateTo('map');

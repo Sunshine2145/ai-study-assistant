@@ -1,0 +1,110 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - generic [ref=e6]: 
+          - generic [ref=e7]: AI伴学
+        - text: 
+      - navigation [ref=e8]:
+        - link " 学习首页" [ref=e9] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e10]: 
+          - generic [ref=e11]: 学习首页
+        - link " 学习地图" [ref=e12] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e13]: 
+          - generic [ref=e14]: 学习地图
+        - link " 开始学习" [ref=e15] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e16]: 
+          - generic [ref=e17]: 开始学习
+        - link " 题目练习" [ref=e18] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e19]: 
+          - generic [ref=e20]: 题目练习
+        - link " 错题本" [ref=e21] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e22]: 
+          - generic [ref=e23]: 错题本
+        - link " 学习报告" [active] [ref=e24] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e25]: 
+          - generic [ref=e26]: 学习报告
+        - link " 题库上传" [ref=e27] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e28]: 
+          - generic [ref=e29]: 题库上传
+        - link " 题库管理" [ref=e30] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e31]: 
+          - generic [ref=e32]: 题库管理
+      - generic [ref=e34]:
+        - generic [ref=e36]: 
+        - generic [ref=e37]:
+          - generic [ref=e38]: 谭晓磊
+          - generic [ref=e39]:
+            - generic [ref=e40]:
+              - generic [ref=e41]: 
+              - text: 0天
+            - generic [ref=e42]:
+              - generic [ref=e43]: 
+              - text: 0分
+    - main [ref=e44]:
+      - generic [ref=e45]:
+        - text: 
+        - generic [ref=e46]: 学习报告
+        - generic [ref=e47]:
+          - button " 3" [ref=e352] [cursor=pointer]:
+            - generic [ref=e49]: 
+            - generic [ref=e50]: "3"
+          - button "" [ref=e51] [cursor=pointer]:
+            - generic [ref=e52]: 
+      - generic [ref=e53]:
+        - text:                                                                                            
+        - generic [ref=e531]:
+          - generic [ref=e532]:
+            - heading " 今日学习报告" [level=2] [ref=e533]:
+              - generic [ref=e534]: 
+              - text: 今日学习报告
+            - generic [ref=e535]: 2026-05-10
+          - generic [ref=e536]:
+            - generic [ref=e538]: 
+            - heading "⏳ 今日任务进行中" [level=3] [ref=e539]
+          - generic [ref=e540]:
+            - generic [ref=e541]:
+              - generic [ref=e543]: 
+              - heading "📚 学习内容" [level=4] [ref=e544]
+              - list [ref=e545]:
+                - listitem [ref=e546]: ✓ 冯·诺依曼计算机结构
+                - listitem [ref=e547]: ✓ 掌握1个核心概念
+                - listitem [ref=e548]: ✓ 完成5道练习题
+            - generic [ref=e549]:
+              - generic [ref=e551]: 
+              - heading "⭐ 获得积分" [level=4] [ref=e552]
+              - list [ref=e553]:
+                - listitem [ref=e554]: ✓ 答题得分：+40分
+                - listitem [ref=e555]: ✓ 连击奖励：+6分
+                - listitem [ref=e556]:
+                  - text: ✓ 今日总计：
+                  - strong [ref=e557]: +46分
+            - generic [ref=e558]:
+              - generic [ref=e560]: 
+              - heading "🔥 学习连续性" [level=4] [ref=e561]
+              - list [ref=e562]:
+                - listitem [ref=e563]: ✓ 连续学习：2天
+                - listitem [ref=e564]: ✓ 最长连续：5天
+            - generic [ref=e565]:
+              - generic [ref=e567]: 
+              - heading "📅 明日预告" [level=4] [ref=e568]
+              - list [ref=e569]:
+                - listitem [ref=e570]: ✓ 处理器（CPU、GPU、DSP、FPGA、国产芯片）
+          - generic [ref=e571]:
+            - button " 分享到飞书" [ref=e572] [cursor=pointer]:
+              - generic [ref=e573]: 
+              - text: 分享到飞书
+            - button "明天继续 " [ref=e574] [cursor=pointer]:
+              - text: 明天继续
+              - generic [ref=e575]: 
+        - text:           + +      
+  - text:     

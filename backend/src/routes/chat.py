@@ -121,6 +121,22 @@ def _save_socratic_history(knowledge_id: int, history: list):
     """, (json.dumps(history, ensure_ascii=False), knowledge_id))
 
 
+def _get_today_learned_knowledge(current_knowledge_id: int = None):
+    """获取今日学习的知识点列表"""
+    learned = db.fetch_all("""
+        SELECT kp.name, lp.mastery_percentage
+        FROM learning_progress lp
+        JOIN knowledge_points kp ON lp.knowledge_point_id = kp.id
+        WHERE DATE(lp.updated_at) = DATE('now')
+        AND lp.learning_phase = 'completed'
+        AND lp.knowledge_point_id != ?
+        ORDER BY lp.updated_at DESC
+        LIMIT 5
+    """, (current_knowledge_id or 0,))
+
+    return [{"name": r[0], "mastery": r[1]} for r in learned] if learned else []
+
+
 async def _generate_feynman_explanation(knowledge_id: int, knowledge_code: str, knowledge_name: str):
     """Phase 1: 生成费曼讲解"""
     feynman = FeynmanService(settings.ai.api_key, settings.ai.model)
@@ -291,13 +307,23 @@ async def _process_socratic_answer(knowledge_id: int, knowledge_code: str, knowl
 
         _complete_and_unlock(knowledge_id)
 
+        # 获取今日学习的知识点
+        today_learned = _get_today_learned_knowledge(knowledge_id)
+        today_summary = ""
+        if today_learned:
+            summary_items = "\n".join([f"• **{k['name']}** - 掌握度 {k['mastery']}%" for k in today_learned])
+            today_summary = f"""
+
+📖 **今日学习收获：**
+{summary_items}"""
+
         response = f"""🎉 **恭喜！已掌握 {knowledge_name}！**
 
 {analysis.get('feedback', '')}
 
 📊 最终掌握度：{new_mastery}% | 共{new_rounds}轮问答
 
-✅ 已解锁下一个知识点，前往学习地图查看！"""
+✅ 已解锁下一个知识点，前往学习地图查看！{today_summary}"""
 
         return {
             "data": {
@@ -310,7 +336,8 @@ async def _process_socratic_answer(knowledge_id: int, knowledge_code: str, knowl
                 "knowledge_name": knowledge_name,
                 "knowledge_id": knowledge_id,
                 "mode": "socratic",
-                "learning_phase": "completed"
+                "learning_phase": "completed",
+                "today_learned_knowledge": today_learned
             }
         }
 

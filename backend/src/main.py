@@ -6,7 +6,7 @@ from loguru import logger
 
 from src.config.settings import settings
 from src.modules.feishu.bot import router as feishu_router
-from src.routes import user, learning, knowledge, chat, questions, answers, wrong_questions, report, reminders, upload, question_bank
+from src.routes import user, learning, knowledge, chat, questions, answers, wrong_questions, report, reminders, upload, question_bank, ai_qa
 
 app = FastAPI(title="AI伴学系统", version="1.0.0")
 
@@ -32,6 +32,7 @@ app.include_router(report.router)
 app.include_router(reminders.router)
 app.include_router(upload.router)
 app.include_router(question_bank.router)
+app.include_router(ai_qa.router)
 
 
 @app.get("/")
@@ -46,4 +47,4 @@ async def health():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8081)
+    uvicorn.run(app, host="0.0.0.0", port=10088)

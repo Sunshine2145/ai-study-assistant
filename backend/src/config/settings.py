@@ -12,7 +12,7 @@ load_dotenv()
 
 class AppConfig(BaseModel):
     host: str = "0.0.0.0"
-    port: int = 8081
+    port: int = 10088
 
 
 class FeishuConfig(BaseModel):
@@ -28,13 +28,13 @@ class DatabaseConfig(BaseModel):
 
 class AIConfig(BaseModel):
     api_key: str = os.getenv("MINIMAX_API_KEY", "")
-    model: str = "MiniMax-M2.7"
+    model: str = "MiniMax-M2.5-highspeed"
     base_url: str = "https://api.minimaxi.com/v1"
 
 
 class DeepSeekConfig(BaseModel):
     api_key: str = os.getenv("DEEPSEEK_API_KEY", "")
-    model: str = "deepseek-chat"
+    model: str = "deepseek-v4-flash"
     base_url: str = "https://api.deepseek.com"
 
 

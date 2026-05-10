@@ -1,0 +1,178 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]: 
+        - generic [ref=e7]: AI伴学
+      - text: 
+    - navigation [ref=e8]:
+      - link " 学习首页" [ref=e9] [cursor=pointer]:
+        - /url: "#"
+        - generic [ref=e10]: 
+        - generic [ref=e11]: 学习首页
+      - link " 学习地图" [ref=e12] [cursor=pointer]:
+        - /url: "#"
+        - generic [ref=e13]: 
+        - generic [ref=e14]: 学习地图
+      - link " 开始学习" [ref=e15] [cursor=pointer]:
+        - /url: "#"
+        - generic [ref=e16]: 
+        - generic [ref=e17]: 开始学习
+      - link " 题目练习" [ref=e18] [cursor=pointer]:
+        - /url: "#"
+        - generic [ref=e19]: 
+        - generic [ref=e20]: 题目练习
+      - link " 错题本" [ref=e21] [cursor=pointer]:
+        - /url: "#"
+        - generic [ref=e22]: 
+        - generic [ref=e23]: 错题本
+      - link " 学习报告" [ref=e24] [cursor=pointer]:
+        - /url: "#"
+        - generic [ref=e25]: 
+        - generic [ref=e26]: 学习报告
+      - link " 题库上传" [ref=e27] [cursor=pointer]:
+        - /url: "#"
+        - generic [ref=e28]: 
+        - generic [ref=e29]: 题库上传
+      - link " 题库管理" [ref=e30] [cursor=pointer]:
+        - /url: "#"
+        - generic [ref=e31]: 
+        - generic [ref=e32]: 题库管理
+    - generic [ref=e34]:
+      - generic [ref=e36]: 
+      - generic [ref=e37]:
+        - generic [ref=e38]: 加载中...
+        - generic [ref=e39]:
+          - generic [ref=e40]:
+            - generic [ref=e41]: 
+            - text: 0天
+          - generic [ref=e42]:
+            - generic [ref=e43]: 
+            - text: 0分
+  - main [ref=e44]:
+    - generic [ref=e45]:
+      - text: 
+      - generic [ref=e46]: 开始学习
+      - generic [ref=e47]:
+        - button " 0" [ref=e48] [cursor=pointer]:
+          - generic [ref=e49]: 
+          - generic [ref=e50]: "0"
+        - button "" [ref=e51] [cursor=pointer]:
+          - generic [ref=e52]: 
+    - generic [ref=e53]:
+      - text:         
+      - generic [ref=e353]:
+        - generic [ref=e354]:
+          - generic [ref=e363]:
+            - generic [ref=e365]: 
+            - generic [ref=e366]:
+              - generic [ref=e367]: AI伴学助手
+              - generic [ref=e368]:
+                - generic [ref=e370]:
+                  - generic [ref=e371]: 1.费曼学习
+                  - generic [ref=e372]: →
+                  - generic [ref=e373]: 2.互动学习
+                  - generic [ref=e374]: →
+                  - generic [ref=e375]: 3.苏格拉底检验
+                - generic [ref=e376]:
+                  - generic [ref=e377]:
+                    - generic [ref=e378]: 
+                    - strong [ref=e379]: 费曼学习法讲解：计算机系统概述
+                  - generic [ref=e380]:
+                    - generic [ref=e381]:
+                      - text: "The user wants me to explain \"计算机系统概述\" (Computer System Overview) using the Feynman learning method. They want me to:"
+                      - text: 1. Start with a life-based analogy
+                      - text: 2. Explain core concepts in no more than 3 sentences
+                      - text: 3. Give 1-2 real-life examples
+                      - text: 4. Use "What if...?" to guide thinking
+                      - text: 5. Use emojis for readability
+                      - text: 6. Keep paragraphs clear with logical progression
+                      - text: Let me structure this in a simple, relatable way that an 8-year-old could understand, while still covering the key aspects of a computer system (hardware, software, data, etc.).
+                      - text: "Key concepts to cover:"
+                      - text: "- Computer system consists of hardware and software"
+                      - text: "- Hardware is the physical parts (like the body)"
+                      - text: "- Software is the instructions/programs (like the thoughts)"
+                      - text: "- They work together to complete tasks"
+                      - text: "- Data is the information processed"
+                      - text: Let me create a fun, simple, and engaging explanation.
+                    - text: "# 💻 计算机系统概述"
+                    - text: "---"
+                    - text: "## 🧸 生活类比：小人国的城市"
+                    - text: 想象一个小人国城市🏰
+                    - text: "-"
+                    - strong [ref=e382]: 硬件
+                    - text: = 城市的建筑、道路、桥梁（看得见、摸得着的实体）
+                    - text: "-"
+                    - strong [ref=e383]: 软件
+                    - text: = 城市里的规则、法律、工作人员的脑子里的知识（指导怎么做事）
+                    - text: "-"
+                    - strong [ref=e384]: 数据
+                    - text: = 进入城市的货物和信息
+                    - text: 💡 没有建筑工人（硬件），规则（软件）无处安放；没有规则（软件），建筑工人不知道该建什么。
+                    - text: "---"
+                    - text: "## 📚 核心概念（3句话）"
+                    - text: "1."
+                    - strong [ref=e385]: 计算机系统 = 硬件 + 软件
+                    - text: ，像身体（硬件）和大脑（软件）的关系🧠
+                    - text: "2."
+                    - strong [ref=e386]: 硬件
+                    - text: 是物理设备，负责"做"；
+                    - strong [ref=e387]: 软件
+                    - text: 是指令，负责"指挥"
+                    - text: "3."
+                    - strong [ref=e388]: 数据
+                    - text: 在系统中流动，被处理、存储、转换 🔄
+                    - text: "---"
+                    - text: "## 🌰 生活中的例子"
+                    - text: "### 例1：手机📱"
+                    - text: "- 你点开一个APP（软件）"
+                    - text: "- 手机屏幕、芯片、电池（硬件）开始工作"
+                    - text: "- 你看到的照片、文字就是被处理的"
+                    - strong [ref=e389]: 数据
+                    - text: "### 例2：点外卖🍔"
+                    - text: "- 你下单（输入数据）→ APP处理（软件运算）→ 外卖小哥出发（硬件执行）→ 饭菜送到你手上（输出数据）"
+                    - text: "---"
+                    - text: "## 🤔 如果...会怎样？"
+                    - text: "-"
+                    - strong [ref=e390]: 如果只有硬件，没有软件？
+                    - text: → 就像给你一个机器人，但没有教它做什么，它会一动不动
+                    - text: "-"
+                    - strong [ref=e391]: 如果只有软件，没有硬件？
+                    - text: → 就像你有做菜的菜谱，但没有锅、没有火，根本做不出来
+                    - text: "-"
+                    - strong [ref=e392]: 如果缺了数据？
+                    - text: → 就像餐厅没有食材，厨师再有本事也做不出菜
+                    - text: "---"
+                    - text: "## 🎯 一句话总结"
+                    - text: "> 计算机系统就是"
+                    - strong [ref=e393]: 硬件
+                    - text: 、
+                    - strong [ref=e394]: 软件
+                    - text: 、
+                    - strong [ref=e395]: 数据
+                    - text: 三兄弟通力合作，把你的想法变成现实的过程！✨
+                - paragraph [ref=e396]: 现在你可以：
+                - list [ref=e397]:
+                  - listitem [ref=e398]: 💬 输入你对这个知识点的疑问，我会为你解答
+                  - listitem [ref=e399]:
+                    - text: ✅ 输入「
+                    - strong [ref=e400]: 学习好了
+                    - text: 」进入苏格拉底检验环节
+                - button " 直接进入检验" [active] [ref=e402] [cursor=pointer]:
+                  - generic [ref=e403]: 
+                  - text: 直接进入检验
+              - generic [ref=e404]: 22:24
+          - generic [ref=e405]:
+            - generic [ref=e406]:
+              - generic [ref=e407]: 学习好了
+              - generic [ref=e408]: 22:24
+            - generic [ref=e410]: 
+        - generic [ref=e355]:
+          - generic [ref=e356]:
+            - generic [ref=e357]: 
+            - generic [ref=e358]: 📖 费曼学习 → 计算机系统概述
+          - generic [ref=e359]:
+            - textbox "输入你的回答..." [ref=e360]
+            - button "" [ref=e361] [cursor=pointer]:
+              - generic [ref=e362]: 
+      - text:                                                                                   + +      

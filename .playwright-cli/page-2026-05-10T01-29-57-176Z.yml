@@ -1,0 +1,184 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - generic [ref=e6]: 
+          - generic [ref=e7]: AI伴学
+        - text: 
+      - navigation [ref=e8]:
+        - link " 学习首页" [ref=e9] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e10]: 
+          - generic [ref=e11]: 学习首页
+        - link " 学习地图" [ref=e12] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e13]: 
+          - generic [ref=e14]: 学习地图
+        - link " 开始学习" [ref=e15] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e16]: 
+          - generic [ref=e17]: 开始学习
+        - link " 题目练习" [ref=e18] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e19]: 
+          - generic [ref=e20]: 题目练习
+        - link " 错题本" [ref=e21] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e22]: 
+          - generic [ref=e23]: 错题本
+        - link " 学习报告" [ref=e24] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e25]: 
+          - generic [ref=e26]: 学习报告
+        - link " 题库上传" [active] [ref=e27] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e28]: 
+          - generic [ref=e29]: 题库上传
+        - link " 题库管理" [ref=e30] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e31]: 
+          - generic [ref=e32]: 题库管理
+      - generic [ref=e34]:
+        - generic [ref=e36]: 
+        - generic [ref=e37]:
+          - generic [ref=e38]: 谭晓磊
+          - generic [ref=e39]:
+            - generic [ref=e40]:
+              - generic [ref=e41]: 
+              - text: 0天
+            - generic [ref=e42]:
+              - generic [ref=e43]: 
+              - text: 0分
+    - main [ref=e44]:
+      - generic [ref=e45]:
+        - text: 
+        - generic [ref=e46]: 题库上传
+        - generic [ref=e47]:
+          - button " 3" [ref=e352] [cursor=pointer]:
+            - generic [ref=e49]: 
+            - generic [ref=e50]: "3"
+          - button "" [ref=e51] [cursor=pointer]:
+            - generic [ref=e52]: 
+      - generic [ref=e53]:
+        - text:                                                                                                ✓ ✓ ✓  ✓ ✓ ✓  ✓ ✓  ✓  
+        - generic [ref=e577]:
+          - generic [ref=e578]:
+            - heading " 题库上传" [level=2] [ref=e579]:
+              - generic [ref=e580]: 
+              - text: 题库上传
+            - button " 查看模板" [ref=e581] [cursor=pointer]:
+              - generic [ref=e582]: 
+              - text: 查看模板
+          - generic [ref=e583]:
+            - generic [ref=e584] [cursor=pointer]:
+              - generic [ref=e586]: 
+              - paragraph [ref=e587]: 拖拽文件到此处，或 点击上传
+              - paragraph [ref=e588]: 支持 .txt、.json、.md、.pdf、.docx、.xlsx 格式
+            - text: 
+          - generic [ref=e589]:
+            - heading " 支持格式说明" [level=3] [ref=e591]:
+              - generic [ref=e592]: 
+              - text: 支持格式说明
+            - generic [ref=e593]:
+              - generic [ref=e594]:
+                - button "JSON格式" [ref=e595] [cursor=pointer]
+                - button "TXT格式" [ref=e596] [cursor=pointer]
+                - button "Markdown格式" [ref=e597] [cursor=pointer]
+                - button "PDF格式" [ref=e598] [cursor=pointer]
+                - button "Word格式" [ref=e599] [cursor=pointer]
+                - button "Excel格式" [ref=e600] [cursor=pointer]
+              - generic [ref=e602]: "[ { \"type\": \"single\", \"content\": \"下列关于Cache的说法，错误的是？\", \"options\": { \"A\": \"位于CPU和内存之间\", \"B\": \"容量比内存大\", \"C\": \"访问速度比内存快\", \"D\": \"由高速SRAM组成\" }, \"answer\": \"B\", \"analysis\": \"Cache的容量通常比内存小很多\" }, { \"type\": \"judge\", \"content\": \"Cache的命中率越高越好。\", \"options\": {}, \"answer\": \"false\", \"analysis\": \"命中率太高可能增加复杂度\" } ]"
+          - generic [ref=e603]:
+            - heading " 关联知识点（可选）" [level=3] [ref=e605]:
+              - generic [ref=e606]: 
+              - text: 关联知识点（可选）
+            - combobox [ref=e608] [cursor=pointer]:
+              - option "-- 不关联特定知识点 --" [selected]
+              - option "1.1 计算机系统概述"
+              - option "1.2.1 冯·诺依曼计算机结构"
+              - option "1.2.2 处理器（CPU、GPU、DSP、FPGA、国产芯片）"
+              - option "1.2.3 指令集（CISC和RISC）"
+              - option "1.2.4 存储器（片上缓存、片外缓存、主存、外存）"
+              - option "1.2.5 总线（内总线、系统总线、外部总线）"
+              - option "1.2.6 接口（显示、音频、网络、SATA）"
+              - option "1.3.1 操作系统（组成、类型、特点原理）"
+              - option "1.3.2 批处理/分时/网络/分布式操作系统"
+              - option "1.3.3 嵌入式操作系统与实时操作系统"
+              - option "1.3.4 数据库系统（关系型、分布式）"
+              - option "1.3.5 文件系统（类型、原理、存取方式）"
+              - option "1.3.6 网络协议（LAN、WAN、无线网、移动通信网）"
+              - option "1.3.7 中间件（MQ Series、Tuxedo）"
+              - option "1.3.8 软件构件（CORBA、J2EE、DNA2000）"
+              - option "1.4.1 嵌入式系统组成及特点"
+              - option "1.4.2 实时系统分类（强实时/弱实时/安全攸关）"
+              - option "1.4.3 嵌入式软件开发方法"
+              - option "1.4.4 安全攸关软件安全性设计（DO-178）"
+              - option "1.5.1 网络基本概念（四阶段、基本功能、指标）"
+              - option "1.5.2 通信技术（信道、信号、复用、5G）"
+              - option "1.5.3 网络技术（LAN、WLAN、WAN、MAN、移动网）"
+              - option "1.5.4 组网技术（OSI/RM、TCP/IP协议集）"
+              - option "1.5.5 网络工程（规划、设计、实施）"
+              - option "1.6.1 机器语言与汇编语言"
+              - option "1.6.2 高级语言（C、C++、Java、Python）"
+              - option "1.6.3 建模语言（UML组成、关系、五种视图）"
+              - option "1.6.4 形式化语言（Z语言）"
+              - option "1.7 多媒体概述、视音频技术、数据压缩、VR/AR"
+              - option "1.8 霍尔三维结构、切克兰德方法、并行工程、MBSE"
+              - option "1.9 性能指标、Amdahl解决方案、负载均衡、性能评估"
+              - option "10.1 未来信息技术（CPS/AI/机器人/边缘计算/数字孪生/云计算/大数据）"
+              - option "2.1.1 信息系统的定义与五个基本功能"
+              - option "2.1.2 信息系统发展六阶段"
+              - option "2.1.3 信息系统分类（TPS/MIS/DSS/ES/OAS）"
+              - option "2.1.4 信息系统生命周期四阶段"
+              - option "2.1.5 信息系统开发方法（结构化/原型/面向对象/面向服务）"
+              - option "2.1.6 综合性信息系统（ERP、WMS、MES、PDM）"
+              - option "3.1 信息安全概述与网络安全"
+              - option "3.2 安全架构（技术体系/组织机构/管理体系）"
+              - option "3.3 信息加解密技术（对称/非对称密钥）"
+              - option "3.4 密钥管理技术"
+              - option "3.5 访问控制及数字签名技术"
+              - option "3.6 抗攻击技术（DoS/欺骗攻击/端口扫描）"
+              - option "3.7 安全保障体系与评估方法"
+              - option "4.1 软件过程模型（瀑布/原型/螺旋/敏捷/RUP/CMMI）"
+              - option "4.2 需求工程（获取、变更、追踪）"
+              - option "4.3 系统分析与设计（SASD/面向对象）"
+              - option "4.4 软件测试（黑盒/白盒/灰盒；单元/集成/系统/验收）"
+              - option "4.5 净室软件工程"
+              - option "4.6 基于构件的软件工程（CBSE）"
+              - option "4.7 软件项目管理（进度/配置/质量/风险管理）"
+              - option "5.1 数据库基本概念（数据模型、DBMS、三级模式）"
+              - option "5.2 关系数据库（关系运算、函数依赖、规范化）"
+              - option "5.3 数据库设计（E-R方法、逻辑设计、物理设计）"
+              - option "5.4 访问接口（ODBC、OCI、ORM）"
+              - option "5.5 NoSQL数据库（列式/键值/文档型/图数据库）"
+              - option "6.1 软件架构概念（定义、设计生命周期、重要性）"
+              - option "6.2 基于架构的软件开发方法（ABSD）"
+              - option "6.3 软件架构风格（数据流/调用返回/以数据为中心/虚拟机/独立构件）"
+              - option "6.4 软件架构复用技术"
+              - option "6.5 特定领域软件架构（DSSA）"
+              - option "7.1 系统质量属性与场景描述"
+              - option "7.2 架构评估方法（SAAM、ATAM、CBAM）"
+              - option "7.3 ATAM架构评估实践（四阶段）"
+              - option "8.1 软件可靠性基本概念"
+              - option "8.2 软件可靠性建模"
+              - option "8.3 可靠性管理/设计/测试/评估"
+              - option "9.1 架构演化概述"
+              - option "9.2 面向对象演化过程"
+              - option "9.3 可持续演化原则"
+              - option "9.4 架构维护（知识管理/修改管理/版本管理/可维护性度量）"
+          - generic [ref=e609]:
+            - heading " AI智能解析" [level=3] [ref=e611]:
+              - generic [ref=e612]: 
+              - text: AI智能解析
+            - generic [ref=e613]:
+              - generic [ref=e614] [cursor=pointer]:
+                - checkbox "启用AI解析（自动识别题目结构）" [checked] [ref=e615]
+                - generic [ref=e616]: 启用AI解析（自动识别题目结构）
+              - generic [ref=e617]:
+                - text: 选择AI：
+                - combobox [ref=e618]:
+                  - option "DeepSeek（推荐，中文支持更好）" [selected]
+                  - option "MiniMax"
+        - text:    + +      
+  - text:     
