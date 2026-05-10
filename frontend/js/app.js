@@ -6,7 +6,7 @@
 // ========================================
 // 配置
 // ========================================
-const API_BASE = 'http://localhost:10088/api';
+const API_BASE = 'http://localhost:5001/api';
 
 // ========================================
 // 状态管理
@@ -110,7 +110,8 @@ const api = {
         return await this.request(`/question-bank/approve/${questionId}`, { method: 'POST' });
     },
     async deleteBank(source) {
-        return await this.request(`/question-bank/bank/${encodeURIComponent(source)}`, { method: 'DELETE' });
+        // Use query parameter to avoid URL encoding issues
+        return await this.request(`/question-bank/bank?source=${encodeURIComponent(source)}`, { method: 'DELETE' });
     },
     async getLearningProgress(knowledgeId) { return await this.request(`/learning/progress/${knowledgeId}`); },
     async completeLearningStep(knowledgeId, step) {
@@ -146,7 +147,7 @@ function navigateTo(page) {
     const activeNav = document.querySelector(`.nav-item[data-page="${page}"]`);
     if (activeNav) activeNav.classList.add('active');
 
-    const pageTitles = { 'home': '学习首页', 'learn': '开始学习', 'map': '学习地图', 'practice': '题目练习', 'wrong': '错题本', 'report': '学习报告', 'upload': '题库上传', 'question-bank': '题库管理' };
+    const pageTitles = { 'home': '学习首页', 'learn': '开始学习', 'map': '学习地图', 'practice': '题目练习', 'wrong': '错题本', 'report': '学习报告', 'upload': '题库上传', 'question-bank': '题库管理', 'ai-qa': 'AI问答' };
     const pageTitle = document.getElementById('pageTitle');
     if (pageTitle && pageTitles[page]) pageTitle.textContent = pageTitles[page];
 
@@ -1379,6 +1380,16 @@ document.addEventListener('DOMContentLoaded', () => {
     initQAChat();
     initUpload();
     initManageTabs();
+    loadUserInfo();
     navigateTo('map');
     console.log('AI伴学系统界面已加载');
 });
+
+async function loadUserInfo() {
+    const user = await api.getUser();
+    if (user && user.nickname) {
+        document.getElementById('userName').textContent = user.nickname;
+    } else {
+        document.getElementById('userName').textContent = '学员';
+    }
+}

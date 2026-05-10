@@ -1,8 +1,8 @@
 # AI伴学系统 - 产品技术文档
 
-> 📅 文档版本：v1.5（融合v1.2新增内容） | 日期：2026-05-07
+> 📅 文档版本：v1.6（新增用户管理模块 + 题库上传进度） | 日期：2026-05-10
 > 👤 开发者：1902
-> 🎯 基于：PRD v1.5
+> 🎯 基于：PRD v1.6
 
 ---
 
@@ -145,16 +145,54 @@ database/
 ```sql
 CREATE TABLE users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    feishu_openid TEXT UNIQUE,                -- 飞书用户唯一标识
-    feishu_union_id TEXT,                      -- 飞书Union ID（跨应用使用）
-    nickname VARCHAR(50),                     -- 昵称
-    avatar VARCHAR(255),                      -- 头像
+    username VARCHAR(50) UNIQUE NOT NULL,        -- 用户名（登录用）
+    password_hash VARCHAR(255) NOT NULL,         -- 密码哈希
+    nickname VARCHAR(50),                        -- 昵称（显示用）
+    avatar VARCHAR(255),                          -- 头像
+    email VARCHAR(255),                          -- 邮箱
+    role VARCHAR(20) DEFAULT 'user',            -- 角色：user/admin
+    permissions TEXT,                         -- JSON：功能权限列表
+    status VARCHAR(20) DEFAULT 'active',      -- 状态：active/banned
     level INTEGER DEFAULT 1,                  -- 学习等级
-    score INTEGER DEFAULT 0,                   -- 总积分
-    streak INTEGER DEFAULT 0,                  -- 连续学习天数
+    score INTEGER DEFAULT 0,                  -- 总积分
+    streak INTEGER DEFAULT 0,                 -- 连续学习天数
     streak_last_date DATE,                     -- 最后学习日期
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+#### user_permissions（用户权限表）
+
+```sql
+CREATE TABLE user_permissions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,                  -- 用户ID
+    module VARCHAR(50) NOT NULL,               -- 功能模块
+    granted_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    granted_by INTEGER,                        -- 授权人ID（管理员）
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    UNIQUE(user_id, module)
+);
+```
+
+#### upload_progress（上传进度表）
+
+```sql
+CREATE TABLE upload_progress (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,                  -- 用户ID
+    file_name VARCHAR(255),                     -- 文件名
+    file_size INTEGER,                          -- 文件大小（字节）
+    status VARCHAR(20) DEFAULT 'pending',     -- pending/processing/completed/failed
+    progress INTEGER DEFAULT 0,                 -- 进度 0-100
+    stage VARCHAR(50),                          -- 当前阶段
+    total_questions INTEGER DEFAULT 0,            -- 总题目数
+    processed_questions INTEGER DEFAULT 0,     -- 已处理题目数
+    error_message TEXT,                         -- 错误信息
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 ```
 
@@ -1411,5 +1449,41 @@ find $BACKUP_DIR -name "*.db" -mtime +7 -delete
 
 ---
 
-_文档版本：v1.5（融合v1.2新增内容） | 最后更新：2026-05-07_
+### 8.2 题库上传进度实现
+
+#### 进度跟踪机制
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    题库上传进度跟踪                             │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  1. 创建上传记录                                                │
+│     └→ upload_progress 表插入初始记录，progress=0               │
+│                                                                  │
+│  2. 阶段性更新                                                  │
+│     └→ 每个处理阶段更新 progress 和 stage 字段                   │
+│        - file_uploaded (10%): 文件上传完成                      │
+│        - parsing (30%): 正在解析文档内容                        │
+│        - recognizing (50%): 识别题型和选项                       │
+│        - importing (80%): 题目数据导入中                        │
+│        - completed (100%): 上传完成                             │
+│                                                                  │
+│  3. 前端轮询/websocket                                          │
+│     └→ 前端每2秒查询进度，或使用websocket实时推送                │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+#### API设计
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| POST | /api/upload/progress | 创建上传任务 |
+| GET | /api/upload/progress/{id} | 获取上传进度 |
+| WebSocket | /ws/upload/{id} | 实时推送进度 |
+
+---
+
+_文档版本：v1.6（新增用户管理模块 + 题库上传进度） | 最后更新：2026-05-10_
 _作者：1902 🦞_

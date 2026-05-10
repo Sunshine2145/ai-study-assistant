@@ -1,0 +1,106 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - generic [ref=e6]: 
+          - generic [ref=e7]: AI伴学
+        - text: 
+      - navigation [ref=e8]:
+        - link " 学习首页" [ref=e9] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e10]: 
+          - generic [ref=e11]: 学习首页
+        - link " 学习地图" [ref=e12] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e13]: 
+          - generic [ref=e14]: 学习地图
+        - link " 开始学习" [ref=e15] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e16]: 
+          - generic [ref=e17]: 开始学习
+        - link " 题目练习" [ref=e18] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e19]: 
+          - generic [ref=e20]: 题目练习
+        - link " 错题本" [ref=e21] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e22]: 
+          - generic [ref=e23]: 错题本
+        - link " 学习报告" [ref=e24] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e25]: 
+          - generic [ref=e26]: 学习报告
+        - link " 题库上传" [ref=e27] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e28]: 
+          - generic [ref=e29]: 题库上传
+        - link " 题库管理" [ref=e30] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e31]: 
+          - generic [ref=e32]: 题库管理
+        - link " AI问答" [ref=e33] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e34]: 
+          - generic [ref=e35]: AI问答
+      - generic [ref=e37]:
+        - generic [ref=e39]: 
+        - generic [ref=e40]:
+          - generic [ref=e41]: 谭晓磊
+          - generic [ref=e42]:
+            - generic [ref=e43]:
+              - generic [ref=e44]: 
+              - text: 0天
+            - generic [ref=e45]:
+              - generic [ref=e46]: 
+              - text: 0分
+    - main [ref=e47]:
+      - generic [ref=e48]:
+        - text: 
+        - generic [ref=e49]: AI问答
+        - generic [ref=e50]:
+          - button " 0" [ref=e51] [cursor=pointer]:
+            - generic [ref=e52]: 
+            - generic [ref=e53]: "0"
+          - button "" [ref=e54] [cursor=pointer]:
+            - generic [ref=e55]: 
+      - generic [ref=e56]:
+        - text:                                                                          
+        - generic [ref=e418]:
+          - generic [ref=e419]:
+            - heading " AI问答" [level=2] [ref=e420]:
+              - generic [ref=e421]: 
+              - text: AI问答
+            - paragraph [ref=e422]: 随时提问，AI即时解答学习疑问
+          - generic [ref=e423]:
+            - generic [ref=e424]:
+              - generic [ref=e425]:
+                - generic [ref=e427]: 
+                - generic [ref=e428]:
+                  - generic [ref=e429]: AI伴学助手
+                  - generic [ref=e430]:
+                    - paragraph [ref=e431]: 你好！我是AI学习助手 👋
+                    - paragraph [ref=e432]: 你可以问我任何关于学习的问题，我会尽力帮你解答。
+                    - paragraph [ref=e433]:
+                      - text: 试试问我：
+                      - strong [ref=e434]: 什么是Cache？
+                      - text: 或
+                      - strong [ref=e435]: 解释一下冯诺依曼结构
+                  - generic [ref=e436]: 刚刚
+              - generic [ref=e442]:
+                - generic [ref=e443]:
+                  - generic [ref=e444]: 什么是CPU？
+                  - generic [ref=e445]: 12:50
+                - generic [ref=e447]: 
+              - generic [ref=e448]:
+                - generic [ref=e450]: 
+                - generic [ref=e451]:
+                  - generic [ref=e452]: AI伴学助手
+                  - generic [ref=e453]: 正在思考中...
+                  - generic [ref=e454]: 12:50
+            - generic [ref=e438]:
+              - textbox "输入你的问题..." [active] [ref=e439]
+              - button "" [ref=e440] [cursor=pointer]:
+                - generic [ref=e441]: 
+        - text:                     + +                                                   
+  - text:     

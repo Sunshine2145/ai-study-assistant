@@ -1,0 +1,209 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - generic [ref=e6]: 
+          - generic [ref=e7]: AI伴学
+        - text: 
+      - navigation [ref=e8]:
+        - link " 学习首页" [ref=e9] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e10]: 
+          - generic [ref=e11]: 学习首页
+        - link " 学习地图" [ref=e12] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e13]: 
+          - generic [ref=e14]: 学习地图
+        - link " 开始学习" [ref=e15] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e16]: 
+          - generic [ref=e17]: 开始学习
+        - link " 题目练习" [ref=e18] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e19]: 
+          - generic [ref=e20]: 题目练习
+        - link " 错题本" [ref=e21] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e22]: 
+          - generic [ref=e23]: 错题本
+        - link " 学习报告" [ref=e24] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e25]: 
+          - generic [ref=e26]: 学习报告
+        - link " 题库上传" [ref=e27] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e28]: 
+          - generic [ref=e29]: 题库上传
+        - link " 题库管理" [active] [ref=e30] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e31]: 
+          - generic [ref=e32]: 题库管理
+        - link " AI问答" [ref=e33] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e34]: 
+          - generic [ref=e35]: AI问答
+      - generic [ref=e37]:
+        - generic [ref=e39]: 
+        - generic [ref=e40]:
+          - generic [ref=e41]: 谭晓磊
+          - generic [ref=e42]:
+            - generic [ref=e43]:
+              - generic [ref=e44]: 
+              - text: 0天
+            - generic [ref=e45]:
+              - generic [ref=e46]: 
+              - text: 0分
+    - main [ref=e47]:
+      - generic [ref=e48]:
+        - text: 
+        - generic [ref=e49]: 题库管理
+        - generic [ref=e50]:
+          - button " 3" [ref=e353] [cursor=pointer]:
+            - generic [ref=e52]: 
+            - generic [ref=e53]: "3"
+          - button "" [ref=e54] [cursor=pointer]:
+            - generic [ref=e55]: 
+      - generic [ref=e56]:
+        - text:                                                                                              
+        - generic [ref=e421]:
+          - generic [ref=e422]:
+            - heading " 题库管理" [level=2] [ref=e423]:
+              - generic [ref=e424]: 
+              - text: 题库管理
+            - button " 刷新" [ref=e426] [cursor=pointer]:
+              - generic [ref=e427]: 
+              - text: 刷新
+          - generic [ref=e428]:
+            - button "题目管理" [ref=e429] [cursor=pointer]
+            - button "知识点管理" [ref=e430] [cursor=pointer]
+          - text:  + + 
+          - generic [ref=e431]:
+            - generic [ref=e432]:
+              - generic [ref=e434]: 
+              - generic [ref=e435]:
+                - generic [ref=e436]: "295"
+                - generic [ref=e437]: 总题目数
+            - generic [ref=e438]:
+              - generic [ref=e440]: 
+              - generic [ref=e441]:
+                - generic [ref=e442]: "295"
+                - generic [ref=e443]: 已启用
+            - generic [ref=e444]:
+              - generic [ref=e446]: 
+              - generic [ref=e447]:
+                - generic [ref=e448]: "0"
+                - generic [ref=e449]: 待审核
+          - generic [ref=e450]:
+            - heading " 题库列表" [level=3] [ref=e452]:
+              - generic [ref=e453]: 
+              - text: 题库列表
+            - generic [ref=e455]:
+              - generic [ref=e456] [cursor=pointer]:
+                - generic [ref=e457]:
+                  - generic [ref=e458]: 02 系统架构第二版 考试大纲.md
+                  - generic:
+                    - generic [ref=e459]: 已启用 174
+                    - generic [ref=e460]: 待审核 0
+                - generic [ref=e461]:
+                  - button " 查看题目" [ref=e462]:
+                    - generic [ref=e463]: 
+                    - text: 查看题目
+                  - button " 删除" [ref=e464]:
+                    - generic [ref=e465]: 
+                    - text: 删除
+              - generic [ref=e466] [cursor=pointer]:
+                - generic [ref=e467]:
+                  - generic [ref=e468]: 高级系统架构设计师上午押题密卷1.pdf
+                  - generic:
+                    - generic [ref=e469]: 已启用 99
+                    - generic [ref=e470]: 待审核 0
+                - generic [ref=e471]:
+                  - button " 查看题目" [ref=e472]:
+                    - generic [ref=e473]: 
+                    - text: 查看题目
+                  - button " 删除" [ref=e474]:
+                    - generic [ref=e475]: 
+                    - text: 删除
+              - generic [ref=e476] [cursor=pointer]:
+                - generic [ref=e477]:
+                  - generic [ref=e478]: test_questions.txt
+                  - generic:
+                    - generic [ref=e479]: 已启用 6
+                    - generic [ref=e480]: 待审核 0
+                - generic [ref=e481]:
+                  - button " 查看题目" [ref=e482]:
+                    - generic [ref=e483]: 
+                    - text: 查看题目
+                  - button " 删除" [ref=e484]:
+                    - generic [ref=e485]: 
+                    - text: 删除
+              - generic [ref=e486] [cursor=pointer]:
+                - generic [ref=e487]:
+                  - generic [ref=e488]: 未分类
+                  - generic:
+                    - generic [ref=e489]: 已启用 6
+                    - generic [ref=e490]: 待审核 0
+                - generic [ref=e491]:
+                  - button " 查看题目" [ref=e492]:
+                    - generic [ref=e493]: 
+                    - text: 查看题目
+                  - button " 删除" [ref=e494]:
+                    - generic [ref=e495]: 
+                    - text: 删除
+              - generic [ref=e496] [cursor=pointer]:
+                - generic [ref=e497]:
+                  - generic [ref=e498]: test.txt
+                  - generic:
+                    - generic [ref=e499]: 已启用 5
+                    - generic [ref=e500]: 待审核 0
+                - generic [ref=e501]:
+                  - button " 查看题目" [ref=e502]:
+                    - generic [ref=e503]: 
+                    - text: 查看题目
+                  - button " 删除" [ref=e504]:
+                    - generic [ref=e505]: 
+                    - text: 删除
+              - generic [ref=e506] [cursor=pointer]:
+                - generic [ref=e507]:
+                  - generic [ref=e508]: test_questions.pdf
+                  - generic:
+                    - generic [ref=e509]: 已启用 4
+                    - generic [ref=e510]: 待审核 0
+                - generic [ref=e511]:
+                  - button " 查看题目" [ref=e512]:
+                    - generic [ref=e513]: 
+                    - text: 查看题目
+                  - button " 删除" [ref=e514]:
+                    - generic [ref=e515]: 
+                    - text: 删除
+              - generic [ref=e516] [cursor=pointer]:
+                - generic [ref=e517]:
+                  - generic [ref=e518]: test_questions.json
+                  - generic:
+                    - generic [ref=e519]: 已启用 1
+                    - generic [ref=e520]: 待审核 0
+                - generic [ref=e521]:
+                  - button " 查看题目" [ref=e522]:
+                    - generic [ref=e523]: 
+                    - text: 查看题目
+                  - button " 删除" [ref=e524]:
+                    - generic [ref=e525]: 
+                    - text: 删除
+          - generic [ref=e526]:
+            - generic [ref=e527]:
+              - heading " 题目列表" [level=3] [ref=e528]:
+                - generic [ref=e529]: 
+                - text: 题目列表
+              - generic [ref=e530]:
+                - combobox [ref=e531] [cursor=pointer]:
+                  - option "全部类型" [selected]
+                  - option "单选题"
+                  - option "多选题"
+                  - option "判断题"
+                - combobox [ref=e532] [cursor=pointer]:
+                  - option "全部状态" [selected]
+                  - option "已启用"
+                  - option "待审核"
+            - paragraph [ref=e535]: 请先选择一个题库
+  - text:     

@@ -174,13 +174,21 @@ class QuestionService:
 
     def delete_by_source(self, source: str) -> int:
         """Delete all questions with the given source. Returns count of deleted questions."""
-        count = db.fetch_one("SELECT COUNT(*) FROM questions WHERE source = ?", (source,))[0] or 0
-        # Get question IDs for cascade delete
-        rows = db.fetch_all("SELECT id FROM questions WHERE source = ?", (source,))
-        for row in rows:
-            db.execute("DELETE FROM answer_records WHERE question_id = ?", (row[0],))
-            db.execute("DELETE FROM wrong_questions WHERE question_id = ?", (row[0],))
-        db.execute("DELETE FROM questions WHERE source = ?", (source,))
+        # Handle "未分类" which maps to NULL in database
+        if source == "未分类":
+            count = db.fetch_one("SELECT COUNT(*) FROM questions WHERE source IS NULL")[0] or 0
+            rows = db.fetch_all("SELECT id FROM questions WHERE source IS NULL")
+            for row in rows:
+                db.execute("DELETE FROM answer_records WHERE question_id = ?", (row[0],))
+                db.execute("DELETE FROM wrong_questions WHERE question_id = ?", (row[0],))
+            db.execute("DELETE FROM questions WHERE source IS NULL")
+        else:
+            count = db.fetch_one("SELECT COUNT(*) FROM questions WHERE source = ?", (source,))[0] or 0
+            rows = db.fetch_all("SELECT id FROM questions WHERE source = ?", (source,))
+            for row in rows:
+                db.execute("DELETE FROM answer_records WHERE question_id = ?", (row[0],))
+                db.execute("DELETE FROM wrong_questions WHERE question_id = ?", (row[0],))
+            db.execute("DELETE FROM questions WHERE source = ?", (source,))
         return count
 
 

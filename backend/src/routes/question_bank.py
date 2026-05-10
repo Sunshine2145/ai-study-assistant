@@ -14,8 +14,8 @@ async def get_question_banks():
     return {"data": question_service.get_banks()}
 
 
-@router.delete("/bank/{source:path}")
-async def delete_bank(source: str):
+@router.delete("/bank")
+async def delete_bank(source: str = Query(..., description="题库来源")):
     """删除整个题库（按来源）"""
     count = question_service.delete_by_source(source)
     if count == 0:

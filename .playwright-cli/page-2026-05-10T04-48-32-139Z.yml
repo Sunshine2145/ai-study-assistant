@@ -1,0 +1,410 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - generic [ref=e6]: 
+          - generic [ref=e7]: AI伴学
+        - text: 
+      - navigation [ref=e8]:
+        - link " 学习首页" [ref=e9] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e10]: 
+          - generic [ref=e11]: 学习首页
+        - link " 学习地图" [ref=e12] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e13]: 
+          - generic [ref=e14]: 学习地图
+        - link " 开始学习" [ref=e15] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e16]: 
+          - generic [ref=e17]: 开始学习
+        - link " 题目练习" [ref=e18] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e19]: 
+          - generic [ref=e20]: 题目练习
+        - link " 错题本" [ref=e21] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e22]: 
+          - generic [ref=e23]: 错题本
+        - link " 学习报告" [ref=e24] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e25]: 
+          - generic [ref=e26]: 学习报告
+        - link " 题库上传" [ref=e27] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e28]: 
+          - generic [ref=e29]: 题库上传
+        - link " 题库管理" [ref=e30] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e31]: 
+          - generic [ref=e32]: 题库管理
+        - link " AI问答" [ref=e33] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e34]: 
+          - generic [ref=e35]: AI问答
+      - generic [ref=e37]:
+        - generic [ref=e39]: 
+        - generic [ref=e40]:
+          - generic [ref=e41]: 谭晓磊
+          - generic [ref=e42]:
+            - generic [ref=e43]:
+              - generic [ref=e44]: 
+              - text: 0天
+            - generic [ref=e45]:
+              - generic [ref=e46]: 
+              - text: 0分
+    - main [ref=e47]:
+      - generic [ref=e48]:
+        - text: 
+        - generic [ref=e49]: 题库管理
+        - generic [ref=e50]:
+          - button " 0" [ref=e51] [cursor=pointer]:
+            - generic [ref=e52]: 
+            - generic [ref=e53]: "0"
+          - button "" [ref=e54] [cursor=pointer]:
+            - generic [ref=e55]: 
+      - generic [ref=e56]:
+        - text:                                                                                              
+        - generic [ref=e66]:
+          - generic [ref=e67]:
+            - heading " 题库管理" [level=2] [ref=e68]:
+              - generic [ref=e69]: 
+              - text: 题库管理
+            - button " 刷新" [ref=e71] [cursor=pointer]:
+              - generic [ref=e72]: 
+              - text: 刷新
+          - generic [ref=e73]:
+            - button "题目管理" [ref=e74] [cursor=pointer]
+            - button "知识点管理" [ref=e75] [cursor=pointer]
+          - text:  + + 
+          - generic [ref=e76]:
+            - generic [ref=e77]:
+              - generic [ref=e79]: 
+              - generic [ref=e80]:
+                - generic [ref=e81]: "279"
+                - generic [ref=e82]: 总题目数
+            - generic [ref=e83]:
+              - generic [ref=e85]: 
+              - generic [ref=e86]:
+                - generic [ref=e87]: "279"
+                - generic [ref=e88]: 已启用
+            - generic [ref=e89]:
+              - generic [ref=e91]: 
+              - generic [ref=e92]:
+                - generic [ref=e93]: "0"
+                - generic [ref=e94]: 待审核
+          - generic [ref=e95]:
+            - heading " 题库列表" [level=3] [ref=e97]:
+              - generic [ref=e98]: 
+              - text: 题库列表
+            - generic [ref=e100]:
+              - generic [ref=e101] [cursor=pointer]:
+                - generic [ref=e102]:
+                  - generic [ref=e103]: 02 系统架构第二版 考试大纲.md
+                  - generic:
+                    - generic [ref=e104]: 已启用 174
+                    - generic [ref=e105]: 待审核 0
+                - generic [ref=e106]:
+                  - button " 查看题目" [active] [ref=e107]:
+                    - generic [ref=e108]: 
+                    - text: 查看题目
+                  - button " 删除" [ref=e109]:
+                    - generic [ref=e110]: 
+                    - text: 删除
+              - generic [ref=e111] [cursor=pointer]:
+                - generic [ref=e112]:
+                  - generic [ref=e113]: 高级系统架构设计师上午押题密卷1.pdf
+                  - generic:
+                    - generic [ref=e114]: 已启用 99
+                    - generic [ref=e115]: 待审核 0
+                - generic [ref=e116]:
+                  - button " 查看题目" [ref=e117]:
+                    - generic [ref=e118]: 
+                    - text: 查看题目
+                  - button " 删除" [ref=e119]:
+                    - generic [ref=e120]: 
+                    - text: 删除
+              - generic [ref=e121] [cursor=pointer]:
+                - generic [ref=e122]:
+                  - generic [ref=e123]: test_questions.txt
+                  - generic:
+                    - generic [ref=e124]: 已启用 6
+                    - generic [ref=e125]: 待审核 0
+                - generic [ref=e126]:
+                  - button " 查看题目" [ref=e127]:
+                    - generic [ref=e128]: 
+                    - text: 查看题目
+                  - button " 删除" [ref=e129]:
+                    - generic [ref=e130]: 
+                    - text: 删除
+          - generic [ref=e131]:
+            - generic [ref=e132]:
+              - heading " 题目列表" [level=3] [ref=e133]:
+                - generic [ref=e134]: 
+                - text: 题目列表
+              - generic [ref=e135]:
+                - combobox [ref=e136] [cursor=pointer]:
+                  - option "全部类型" [selected]
+                  - option "单选题"
+                  - option "多选题"
+                  - option "判断题"
+                - combobox [ref=e137] [cursor=pointer]:
+                  - option "全部状态" [selected]
+                  - option "已启用"
+                  - option "待审核"
+            - generic [ref=e138]:
+              - table [ref=e141]:
+                - rowgroup [ref=e142]:
+                  - row "类型 题目内容 知识点 状态 操作" [ref=e143]:
+                    - columnheader "类型" [ref=e144]
+                    - columnheader "题目内容" [ref=e145]
+                    - columnheader "知识点" [ref=e146]
+                    - columnheader "状态" [ref=e147]
+                    - columnheader "操作" [ref=e148]
+                - rowgroup [ref=e149]:
+                  - row "单选 - 已启用  " [ref=e150]:
+                    - cell "单选" [ref=e151]:
+                      - generic [ref=e152]: 单选
+                    - cell [ref=e153]
+                    - cell "-" [ref=e154]
+                    - cell "已启用" [ref=e155]:
+                      - generic [ref=e156]: 已启用
+                    - cell " " [ref=e157]:
+                      - button "" [ref=e158] [cursor=pointer]:
+                        - generic [ref=e159]: 
+                      - button "" [ref=e160] [cursor=pointer]:
+                        - generic [ref=e161]: 
+                  - row "单选 - 已启用  " [ref=e162]:
+                    - cell "单选" [ref=e163]:
+                      - generic [ref=e164]: 单选
+                    - cell [ref=e165]
+                    - cell "-" [ref=e166]
+                    - cell "已启用" [ref=e167]:
+                      - generic [ref=e168]: 已启用
+                    - cell " " [ref=e169]:
+                      - button "" [ref=e170] [cursor=pointer]:
+                        - generic [ref=e171]: 
+                      - button "" [ref=e172] [cursor=pointer]:
+                        - generic [ref=e173]: 
+                  - row "单选 - 已启用  " [ref=e174]:
+                    - cell "单选" [ref=e175]:
+                      - generic [ref=e176]: 单选
+                    - cell [ref=e177]
+                    - cell "-" [ref=e178]
+                    - cell "已启用" [ref=e179]:
+                      - generic [ref=e180]: 已启用
+                    - cell " " [ref=e181]:
+                      - button "" [ref=e182] [cursor=pointer]:
+                        - generic [ref=e183]: 
+                      - button "" [ref=e184] [cursor=pointer]:
+                        - generic [ref=e185]: 
+                  - 'row "单选 ## 3.1-3.6 层次架构设计 - 已启用  " [ref=e186]':
+                    - cell "单选" [ref=e187]:
+                      - generic [ref=e188]: 单选
+                    - cell "## 3.1-3.6 层次架构设计" [ref=e189]
+                    - cell "-" [ref=e190]
+                    - cell "已启用" [ref=e191]:
+                      - generic [ref=e192]: 已启用
+                    - cell " " [ref=e193]:
+                      - button "" [ref=e194] [cursor=pointer]:
+                        - generic [ref=e195]: 
+                      - button "" [ref=e196] [cursor=pointer]:
+                        - generic [ref=e197]: 
+                  - 'row "单选 ## 2.4 案例分析 - 已启用  " [ref=e198]':
+                    - cell "单选" [ref=e199]:
+                      - generic [ref=e200]: 单选
+                    - cell "## 2.4 案例分析" [ref=e201]
+                    - cell "-" [ref=e202]
+                    - cell "已启用" [ref=e203]:
+                      - generic [ref=e204]: 已启用
+                    - cell " " [ref=e205]:
+                      - button "" [ref=e206] [cursor=pointer]:
+                        - generic [ref=e207]: 
+                      - button "" [ref=e208] [cursor=pointer]:
+                        - generic [ref=e209]: 
+                  - 'row "单选 ## 2.3 信息化总体架构方法 - 已启用  " [ref=e210]':
+                    - cell "单选" [ref=e211]:
+                      - generic [ref=e212]: 单选
+                    - cell "## 2.3 信息化总体架构方法" [ref=e213]
+                    - cell "-" [ref=e214]
+                    - cell "已启用" [ref=e215]:
+                      - generic [ref=e216]: 已启用
+                    - cell " " [ref=e217]:
+                      - button "" [ref=e218] [cursor=pointer]:
+                        - generic [ref=e219]: 
+                      - button "" [ref=e220] [cursor=pointer]:
+                        - generic [ref=e221]: 
+                  - 'row "单选 ## 2.2 信息系统架构设计方法（ADM） - 已启用  " [ref=e222]':
+                    - cell "单选" [ref=e223]:
+                      - generic [ref=e224]: 单选
+                    - cell "## 2.2 信息系统架构设计方法（ADM）" [ref=e225]
+                    - cell "-" [ref=e226]
+                    - cell "已启用" [ref=e227]:
+                      - generic [ref=e228]: 已启用
+                    - cell " " [ref=e229]:
+                      - button "" [ref=e230] [cursor=pointer]:
+                        - generic [ref=e231]: 
+                      - button "" [ref=e232] [cursor=pointer]:
+                        - generic [ref=e233]: 
+                  - 'row "单选 ## 2.1 信息系统架构概述 - 已启用  " [ref=e234]':
+                    - cell "单选" [ref=e235]:
+                      - generic [ref=e236]: 单选
+                    - cell "## 2.1 信息系统架构概述" [ref=e237]
+                    - cell "-" [ref=e238]
+                    - cell "已启用" [ref=e239]:
+                      - generic [ref=e240]: 已启用
+                    - cell " " [ref=e241]:
+                      - button "" [ref=e242] [cursor=pointer]:
+                        - generic [ref=e243]: 
+                      - button "" [ref=e244] [cursor=pointer]:
+                        - generic [ref=e245]: 
+                  - 'row "单选 # 1. 系统计划 - 已启用  " [ref=e246]':
+                    - cell "单选" [ref=e247]:
+                      - generic [ref=e248]: 单选
+                    - cell "# 1. 系统计划" [ref=e249]
+                    - cell "-" [ref=e250]
+                    - cell "已启用" [ref=e251]:
+                      - generic [ref=e252]: 已启用
+                    - cell " " [ref=e253]:
+                      - button "" [ref=e254] [cursor=pointer]:
+                        - generic [ref=e255]: 
+                      - button "" [ref=e256] [cursor=pointer]:
+                        - generic [ref=e257]: 
+                  - row "单选 - 已启用  " [ref=e258]:
+                    - cell "单选" [ref=e259]:
+                      - generic [ref=e260]: 单选
+                    - cell [ref=e261]
+                    - cell "-" [ref=e262]
+                    - cell "已启用" [ref=e263]:
+                      - generic [ref=e264]: 已启用
+                    - cell " " [ref=e265]:
+                      - button "" [ref=e266] [cursor=pointer]:
+                        - generic [ref=e267]: 
+                      - button "" [ref=e268] [cursor=pointer]:
+                        - generic [ref=e269]: 
+                  - 'row "单选 # 13. 专业英语 - 已启用  " [ref=e270]':
+                    - cell "单选" [ref=e271]:
+                      - generic [ref=e272]: 单选
+                    - cell "# 13. 专业英语" [ref=e273]
+                    - cell "-" [ref=e274]
+                    - cell "已启用" [ref=e275]:
+                      - generic [ref=e276]: 已启用
+                    - cell " " [ref=e277]:
+                      - button "" [ref=e278] [cursor=pointer]:
+                        - generic [ref=e279]: 
+                      - button "" [ref=e280] [cursor=pointer]:
+                        - generic [ref=e281]: 
+                  - 'row "单选 # 12. 应用数学 - 已启用  " [ref=e282]':
+                    - cell "单选" [ref=e283]:
+                      - generic [ref=e284]: 单选
+                    - cell "# 12. 应用数学" [ref=e285]
+                    - cell "-" [ref=e286]
+                    - cell "已启用" [ref=e287]:
+                      - generic [ref=e288]: 已启用
+                    - cell " " [ref=e289]:
+                      - button "" [ref=e290] [cursor=pointer]:
+                        - generic [ref=e291]: 
+                      - button "" [ref=e292] [cursor=pointer]:
+                        - generic [ref=e293]: 
+                  - 'row "单选 # 11. 标准化与知识产权 - 已启用  " [ref=e294]':
+                    - cell "单选" [ref=e295]:
+                      - generic [ref=e296]: 单选
+                    - cell "# 11. 标准化与知识产权" [ref=e297]
+                    - cell "-" [ref=e298]
+                    - cell "已启用" [ref=e299]:
+                      - generic [ref=e300]: 已启用
+                    - cell " " [ref=e301]:
+                      - button "" [ref=e302] [cursor=pointer]:
+                        - generic [ref=e303]: 
+                      - button "" [ref=e304] [cursor=pointer]:
+                        - generic [ref=e305]: 
+                  - 'row "单选 # 10. 未来信息综合技术 - 已启用  " [ref=e306]':
+                    - cell "单选" [ref=e307]:
+                      - generic [ref=e308]: 单选
+                    - cell "# 10. 未来信息综合技术" [ref=e309]
+                    - cell "-" [ref=e310]
+                    - cell "已启用" [ref=e311]:
+                      - generic [ref=e312]: 已启用
+                    - cell " " [ref=e313]:
+                      - button "" [ref=e314] [cursor=pointer]:
+                        - generic [ref=e315]: 
+                      - button "" [ref=e316] [cursor=pointer]:
+                        - generic [ref=e317]: 
+                  - 'row "单选 ## 9.1-9.7 演化与维护 - 已启用  " [ref=e318]':
+                    - cell "单选" [ref=e319]:
+                      - generic [ref=e320]: 单选
+                    - cell "## 9.1-9.7 演化与维护" [ref=e321]
+                    - cell "-" [ref=e322]
+                    - cell "已启用" [ref=e323]:
+                      - generic [ref=e324]: 已启用
+                    - cell " " [ref=e325]:
+                      - button "" [ref=e326] [cursor=pointer]:
+                        - generic [ref=e327]: 
+                      - button "" [ref=e328] [cursor=pointer]:
+                        - generic [ref=e329]: 
+                  - 'row "单选 ## 8.3-8.6 可靠性管理/设计/测试/评估 - 已启用  " [ref=e330]':
+                    - cell "单选" [ref=e331]:
+                      - generic [ref=e332]: 单选
+                    - cell "## 8.3-8.6 可靠性管理/设计/测试/评估" [ref=e333]
+                    - cell "-" [ref=e334]
+                    - cell "已启用" [ref=e335]:
+                      - generic [ref=e336]: 已启用
+                    - cell " " [ref=e337]:
+                      - button "" [ref=e338] [cursor=pointer]:
+                        - generic [ref=e339]: 
+                      - button "" [ref=e340] [cursor=pointer]:
+                        - generic [ref=e341]: 
+                  - 'row "单选 ## 8.2 软件可靠性建模 - 已启用  " [ref=e342]':
+                    - cell "单选" [ref=e343]:
+                      - generic [ref=e344]: 单选
+                    - cell "## 8.2 软件可靠性建模" [ref=e345]
+                    - cell "-" [ref=e346]
+                    - cell "已启用" [ref=e347]:
+                      - generic [ref=e348]: 已启用
+                    - cell " " [ref=e349]:
+                      - button "" [ref=e350] [cursor=pointer]:
+                        - generic [ref=e351]: 
+                      - button "" [ref=e352] [cursor=pointer]:
+                        - generic [ref=e353]: 
+                  - 'row "单选 ## 8.1 软件可靠性基本概念 - 已启用  " [ref=e354]':
+                    - cell "单选" [ref=e355]:
+                      - generic [ref=e356]: 单选
+                    - cell "## 8.1 软件可靠性基本概念" [ref=e357]
+                    - cell "-" [ref=e358]
+                    - cell "已启用" [ref=e359]:
+                      - generic [ref=e360]: 已启用
+                    - cell " " [ref=e361]:
+                      - button "" [ref=e362] [cursor=pointer]:
+                        - generic [ref=e363]: 
+                      - button "" [ref=e364] [cursor=pointer]:
+                        - generic [ref=e365]: 
+                  - 'row "单选 ## 7.3 ATAM方法架构评估实践 - 已启用  " [ref=e366]':
+                    - cell "单选" [ref=e367]:
+                      - generic [ref=e368]: 单选
+                    - cell "## 7.3 ATAM方法架构评估实践" [ref=e369]
+                    - cell "-" [ref=e370]
+                    - cell "已启用" [ref=e371]:
+                      - generic [ref=e372]: 已启用
+                    - cell " " [ref=e373]:
+                      - button "" [ref=e374] [cursor=pointer]:
+                        - generic [ref=e375]: 
+                      - button "" [ref=e376] [cursor=pointer]:
+                        - generic [ref=e377]: 
+                  - 'row "单选 ## 7.2 系统架构评估 - 已启用  " [ref=e378]':
+                    - cell "单选" [ref=e379]:
+                      - generic [ref=e380]: 单选
+                    - cell "## 7.2 系统架构评估" [ref=e381]
+                    - cell "-" [ref=e382]
+                    - cell "已启用" [ref=e383]:
+                      - generic [ref=e384]: 已启用
+                    - cell " " [ref=e385]:
+                      - button "" [ref=e386] [cursor=pointer]:
+                        - generic [ref=e387]: 
+                      - button "" [ref=e388] [cursor=pointer]:
+                        - generic [ref=e389]: 
+              - generic [ref=e390]:
+                - generic [ref=e391]: 第 1 / 9 页
+                - button "" [ref=e392] [cursor=pointer]:
+                  - generic [ref=e393]: 
+  - text:     
