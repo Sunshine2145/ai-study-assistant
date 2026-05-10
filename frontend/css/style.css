@@ -10,7 +10,11 @@
     --primary-light: #3B82F6;
     --primary-dark: #1D4ED8;
     --primary-bg: #EFF6FF;
-    
+
+    /* 渐变色彩 - 登录页 */
+    --gradient-start: #667eea;
+    --gradient-end: #764ba2;
+
     /* 功能色 */
     --success: #10B981;
     --success-light: #D1FAE5;
@@ -329,6 +333,265 @@ body {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* ========================================
+   登录/注册页面
+   ======================================== */
+:root {
+    --login-gradient: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+}
+
+/* 登录页背景 */
+.page-login-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--login-gradient);
+    z-index: -1;
+}
+
+/* 登录卡片容器 */
+.login-page-container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.login-card-new {
+    background: #fff;
+    width: 85%;
+    max-width: 400px;
+    padding: 40px 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    animation: loginFadeIn 0.5s ease-out;
+}
+
+@keyframes loginFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.login-card-new .header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.login-card-new .header h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.login-card-new .header p {
+    color: #999;
+    font-size: 14px;
+}
+
+/* 选项卡切换 */
+.login-tabs {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.login-tab-item {
+    flex: 1;
+    text-align: center;
+    padding-bottom: 10px;
+    font-size: 16px;
+    color: #999;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.login-tab-item.active {
+    color: var(--gradient-start);
+    font-weight: 600;
+    border-bottom: 2px solid var(--gradient-start);
+}
+
+/* 输入框组 */
+.login-input-group {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.login-input-group input {
+    width: 100%;
+    padding: 15px 15px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s;
+    background: #f9f9f9;
+}
+
+.login-input-group input:focus {
+    border-color: var(--gradient-start);
+    background: #fff;
+}
+
+/* 验证码输入框 */
+.login-code-group {
+    display: flex;
+    gap: 10px;
+}
+
+.login-code-group input {
+    flex: 1;
+}
+
+.login-get-code {
+    width: 100px;
+    border: 1px solid var(--gradient-start);
+    background: #fff;
+    color: var(--gradient-start);
+    border-radius: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.login-get-code:active {
+    background: #f0f0f0;
+}
+
+.login-get-code:disabled {
+    background: #eee;
+    color: #999;
+    border-color: #ddd;
+    cursor: not-allowed;
+}
+
+/* 登录按钮 */
+.login-submit-btn {
+    width: 100%;
+    padding: 15px;
+    background: var(--login-gradient);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(118, 75, 162, 0.3);
+    transition: transform 0.1s;
+}
+
+.login-submit-btn:active {
+    transform: scale(0.98);
+}
+
+.login-submit-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* 底部链接 */
+.login-footer-links {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.login-footer-links a {
+    color: #666;
+    text-decoration: none;
+}
+
+.login-footer-links a:hover {
+    color: var(--gradient-start);
+}
+
+/* 第三方登录 */
+.login-social {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.login-social p {
+    font-size: 12px;
+    color: #ccc;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.login-social p::before,
+.login-social p::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 30%;
+    height: 1px;
+    background: #eee;
+}
+
+.login-social p::before {
+    left: 0;
+}
+
+.login-social p::after {
+    right: 0;
+}
+
+.login-social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.login-social-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.login-social-icon:hover {
+    background: #eee;
+}
+
+.login-social-icon.wechat::after {
+    content: '微信';
+    font-size: 11px;
+    color: #07C160;
+    font-weight: bold;
+}
+
+.login-social-icon.alipay::after {
+    content: '支付宝';
+    font-size: 11px;
+    color: #1677FF;
+    font-weight: bold;
+}
+
+.login-social-icon.apple {
+    background: #000;
+}
+
+.login-social-icon.apple span {
+    color: #fff;
+    font-size: 11px;
 }
 
 /* ========================================

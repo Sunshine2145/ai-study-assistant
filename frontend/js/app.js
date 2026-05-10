@@ -142,6 +142,18 @@ const api = {
             body: JSON.stringify({ username, password, nickname })
         });
     },
+    async loginWithCode(username, code) {
+        return await this.request('/auth/login-code', {
+            method: 'POST',
+            body: JSON.stringify({ username, code })
+        });
+    },
+    async sendSmsCode(username) {
+        return await this.request('/auth/send-code', {
+            method: 'POST',
+            body: JSON.stringify({ username })
+        });
+    },
     async logout() {
         return await this.request('/auth/logout', { method: 'POST' });
     },
@@ -1513,6 +1525,156 @@ async function doRegister() {
         showLogin();
     } else {
         alert(result?.message || '注册失败');
+    }
+}
+
+// 新登录页 - 密码/验证码切换
+function switchLoginTab(type) {
+    const tabs = document.querySelectorAll('.login-tab-item');
+    const passwordInput = document.getElementById('password-input-group');
+    const codeInput = document.getElementById('code-input-group');
+    const passwordField = document.getElementById('loginPassword');
+
+    if (type === 'password') {
+        tabs[0].classList.add('active');
+        tabs[1].classList.remove('active');
+        passwordInput.style.display = 'block';
+        codeInput.style.display = 'none';
+        passwordField.required = true;
+    } else {
+        tabs[0].classList.remove('active');
+        tabs[1].classList.add('active');
+        passwordInput.style.display = 'none';
+        codeInput.style.display = 'flex';
+        passwordField.required = false;
+    }
+}
+
+// 发送验证码倒计时
+async function sendLoginCode(btn) {
+    const username = document.getElementById('loginUsername').value.trim();
+    if (!username) {
+        alert('请先输入手机号/用户名');
+        return;
+    }
+
+    // 调用后端API发送验证码
+    const result = await api.sendSmsCode(username);
+    if (!result || !result.success) {
+        alert(result?.message || '发送失败，请稍后重试');
+        return;
+    }
+
+    let time = 60;
+    btn.disabled = true;
+    btn.style.background = '#eee';
+    btn.style.color = '#999';
+    btn.style.border = '1px solid #ddd';
+
+    const timer = setInterval(() => {
+        time--;
+        btn.innerText = `${time}s`;
+        if (time <= 0) {
+            clearInterval(timer);
+            btn.innerText = '获取验证码';
+            btn.disabled = false;
+            btn.style.background = '#fff';
+            btn.style.color = '#667eea';
+            btn.style.border = '1px solid #667eea';
+        }
+    }, 1000);
+}
+
+// 新登录页 - 登录提交
+async function doLoginNew(event) {
+    event.preventDefault();
+
+    const username = document.getElementById('loginUsername').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const code = document.getElementById('loginCode')?.value;
+
+    // 判断是密码登录还是验证码登录
+    const isPasswordTab = document.querySelector('.login-tab-item.active').textContent.includes('密码');
+
+    if (!username) {
+        alert('请输入手机号/用户名');
+        return;
+    }
+
+    if (isPasswordTab && !password) {
+        alert('请输入密码');
+        return;
+    }
+
+    if (!isPasswordTab && !code) {
+        alert('请输入验证码');
+        return;
+    }
+
+    const btn = document.querySelector('.login-submit-btn');
+    const originalText = btn.innerText;
+
+    btn.innerText = '登录中...';
+    btn.disabled = true;
+
+    try {
+        let result;
+        if (isPasswordTab) {
+            result = await api.login(username, password);
+        } else {
+            // 验证码登录逻辑
+            result = await api.loginWithCode(username, code);
+        }
+
+        console.log('Login result:', result);
+        if (result && result.user_id) {
+            localStorage.setItem('user', JSON.stringify(result));
+            loadUserInfo();
+            navigateTo('map');
+        } else {
+            alert(result?.detail || '登录失败');
+        }
+    } catch (error) {
+        alert('登录失败: ' + error.message);
+    } finally {
+        btn.innerText = originalText;
+        btn.disabled = false;
+    }
+}
+
+// 新登录页 - 注册提交
+async function doRegisterNew(event) {
+    event.preventDefault();
+
+    const username = document.getElementById('regUsername').value.trim();
+    const password = document.getElementById('regPassword').value;
+    const nickname = document.getElementById('regNickname')?.value.trim();
+    const email = document.getElementById('regEmail')?.value.trim();
+
+    if (!username || !password) {
+        alert('请输入用户名和密码');
+        return;
+    }
+
+    const btn = document.querySelector('.login-submit-btn');
+    const originalText = btn.innerText;
+
+    btn.innerText = '注册中...';
+    btn.disabled = true;
+
+    try {
+        const result = await api.register(username, password, nickname || username, email);
+        if (result && result.success) {
+            alert('注册成功，请登录');
+            showLogin();
+        } else {
+            alert(result?.message || '注册失败');
+        }
+    } catch (error) {
+        alert('注册失败: ' + error.message);
+    } finally {
+        btn.innerText = originalText;
+        btn.disabled = false;
     }
 }
 

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>用户登录</title>
+    <style>
+        /* --- 基础重置 --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+        }
+
+        /* --- 登录卡片 --- */
+        .login-container {
+            background: #fff;
+            width: 85%;
+            max-width: 400px;
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h2 { font-size: 24px; font-weight: 600; color: #333; margin-bottom: 5px; }
+        .header p { color: #999; font-size: 14px; }
+
+        /* --- 选项卡切换 --- */
+        .tabs { display: flex; margin-bottom: 20px; border-bottom: 1px solid #eee; }
+        .tab-item {
+            flex: 1;
+            text-align: center;
+            padding-bottom: 10px;
+            font-size: 16px;
+            color: #999;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .tab-item.active { color: #667eea; font-weight: 600; border-bottom: 2px solid #667eea; }
+
+        /* --- 表单元素 --- */
+        .input-group { position: relative; margin-bottom: 20px; }
+        .input-group input {
+            width: 100%;
+            padding: 15px 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+            background: #f9f9f9;
+        }
+        .input-group input:focus { border-color: #667eea; background: #fff; }
+        
+        /* 验证码输入框特殊处理 */
+        .code-group { display: flex; gap: 10px; }
+        .code-group input { flex: 1; }
+        .get-code {
+            width: 100px;
+            border: 1px solid #667eea;
+            background: #fff;
+            color: #667eea;
+            border-radius: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .get-code:active { background: #f0f0f0; }
+
+        /* --- 登录按钮 --- */
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(to right, #667eea, #764ba2);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(118, 75, 162, 0.3);
+            transition: transform 0.1s;
+        }
+        .submit-btn:active { transform: scale(0.98); }
+
+        /* --- 底部链接 --- */
+        .footer-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .footer-links a { color: #666; text-decoration: none; }
+        .footer-links a:hover { color: #667eea; }
+
+        /* --- 第三方登录 --- */
+        .social-login { margin-top: 30px; text-align: center; }
+        .social-login p { font-size: 12px; color: #ccc; margin-bottom: 15px; position: relative; }
+        .social-login p::before, .social-login p::after {
+            content: ''; position: absolute; top: 50%; width: 30%; height: 1px; background: #eee;
+        }
+        .social-login p::before { left: 0; }
+        .social-login p::after { right: 0; }
+        
+        .social-icons { display: flex; justify-content: center; gap: 20px; }
+        .social-icon {
+            width: 40px; height: 40px; border-radius: 50%; background: #f5f5f5;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: 0.3s;
+        }
+        .social-icon:hover { background: #eee; }
+        /* 这里用文字代替图标，实际开发可用SVG或IconFont */
+        .icon-wechat::after { content: '微信'; font-size: 12px; color: #07C160; font-weight: bold; }
+        .icon-alipay::after { content: '支付宝'; font-size: 12px; color: #1677FF; font-weight: bold; }
+
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <div class="header">
+        <h2>欢迎回来</h2>
+        <p>请登录您的账号</p>
+    </div>
+
+    <!-- 登录方式切换 -->
+    <div class="tabs">
+        <div class="tab-item active" onclick="switchTab('password')">密码登录</div>
+        <div class="tab-item" onclick="switchTab('code')">验证码登录</div>
+    </div>
+
+    <form id="loginForm">
+        <!-- 账号输入 -->
+        <div class="input-group">
+            <input type="text" id="username" placeholder="请输入手机号/用户名" required>
+        </div>
+
+        <!-- 密码输入 (默认显示) -->
+        <div class="input-group" id="password-input">
+            <input type="password" id="password" placeholder="请输入密码">
+        </div>
+
+        <!-- 验证码输入 (默认隐藏) -->
+        <div class="input-group code-group" id="code-input" style="display: none;">
+            <input type="number" placeholder="请输入验证码">
+            <button type="button" class="get-code" onclick="sendCode(this)">获取验证码</button>
+        </div>
+
+        <button type="submit" class="submit-btn">登 录</button>
+    </form>
+
+    <div class="footer-links">
+        <a href="#">忘记密码？</a>
+        <a href="#">注册账号</a>
+    </div>
+
+    <!-- 第三方登录 -->
+    <div class="social-login">
+        <p>其他登录方式</p>
+        <div class="social-icons">
+            <div class="social-icon icon-wechat"></div>
+            <div class="social-icon icon-alipay"></div>
+            <div class="social-icon" style="background: #000;"><span style="color:#fff; font-size:12px;">Apple</span></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 切换登录方式
+    function switchTab(type) {
+        const tabs = document.querySelectorAll('.tab-item');
+        const passwordInput = document.getElementById('password-input');
+        const codeInput = document.getElementById('code-input');
+        const passwordField = document.getElementById('password');
+
+        if (type === 'password') {
+            tabs[0].classList.add('active');
+            tabs[1].classList.remove('active');
+            passwordInput.style.display = 'block';
+            codeInput.style.display = 'none';
+            passwordField.required = true;
+        } else {
+            tabs[0].classList.remove('active');
+            tabs[1].classList.add('active');
+            passwordInput.style.display = 'none';
+            codeInput.style.display = 'block';
+            passwordField.required = false;
+        }
+    }
+
+    // 模拟发送验证码倒计时
+    function sendCode(btn) {
+        let time = 60;
+        btn.disabled = true;
+        btn.style.background = '#eee';
+        btn.style.color = '#999';
+        btn.style.border = '1px solid #ddd';
+        
+        const timer = setInterval(() => {
+            time--;
+            btn.innerText = `${time}s`;
+            if (time <= 0) {
+                clearInterval(timer);
+                btn.innerText = '获取验证码';
+                btn.disabled = false;
+                btn.style.background = '#fff';
+                btn.style.color = '#667eea';
+                btn.style.border = '1px solid #667eea';
+            }
+        }, 1000);
+    }
+
+    // 模拟登录提交
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const btn = document.querySelector('.submit-btn');
+        const originalText = btn.innerText;
+        
+        btn.innerText = '登录中...';
+        btn.style.opacity = '0.7';
+        
+        setTimeout(() => {
+            alert(`登录成功！\n账号：${username}`);
+            btn.innerText = originalText;
+            btn.style.opacity = '1';
+        }, 1000);
+    });
+</script>
+
+</body>
+</html>

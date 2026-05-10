@@ -4,7 +4,9 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional
 import hashlib
-from datetime import datetime
+import random
+import string
+from datetime import datetime, timedelta
 
 from src.database.db import db
 
@@ -23,6 +25,15 @@ class LoginRequest(BaseModel):
     password: str
 
 
+class LoginCodeRequest(BaseModel):
+    username: str
+    code: str
+
+
+class SendCodeRequest(BaseModel):
+    username: str
+
+
 class LoginResponse(BaseModel):
     user_id: int
     username: str
@@ -30,6 +41,10 @@ class LoginResponse(BaseModel):
     role: str
     permissions: Optional[list] = None
     token: str
+
+
+# 验证码存储 (生产环境应使用Redis)
+verification_codes = {}
 
 
 def hash_password(password: str) -> str:
@@ -40,6 +55,11 @@ def hash_password(password: str) -> str:
 def generate_token(user_id: int, username: str) -> str:
     """Generate simple token"""
     return hashlib.sha256(f"{user_id}:{username}:{datetime.now()}".encode()).hexdigest()
+
+
+def generate_verification_code(length: int = 6) -> str:
+    """Generate numeric verification code"""
+    return ''.join(random.choices(string.digits, k=length))
 
 
 @router.post("/register")
@@ -168,4 +188,84 @@ async def get_current_user_full():
         "status": user[6] or "active",
         "score": user[7] or 0,
         "streak": user[8] or 0
+    }
+
+
+@router.post("/send-code")
+async def send_verification_code(request: SendCodeRequest):
+    """发送验证码"""
+    # 检查用户是否存在
+    user = db.fetch_one(
+        "SELECT id FROM users WHERE username = ?",
+        (request.username,)
+    )
+    if not user:
+        raise HTTPException(status_code=404, detail="用户不存在")
+
+    # 生成6位验证码
+    code = generate_verification_code()
+
+    # 存储验证码，设置5分钟过期
+    verification_codes[request.username] = {
+        "code": code,
+        "expires": datetime.now() + timedelta(minutes=5)
+    }
+
+    # 实际生产环境应该发送短信，这里只是模拟
+    print(f"验证码: {code} (仅开发环境显示)")
+
+    return {
+        "success": True,
+        "message": "验证码已发送"
+    }
+
+
+@router.post("/login-code")
+async def login_with_code(request: LoginCodeRequest):
+    """验证码登录"""
+    # 检查验证码
+    stored = verification_codes.get(request.username)
+    if not stored:
+        raise HTTPException(status_code=400, detail="请先获取验证码")
+
+    # 检查是否过期
+    if datetime.now() > stored["expires"]:
+        del verification_codes[request.username]
+        raise HTTPException(status_code=400, detail="验证码已过期，请重新获取")
+
+    # 验证验证码
+    if stored["code"] != request.code:
+        raise HTTPException(status_code=400, detail="验证码错误")
+
+    # 验证成功，删除验证码
+    del verification_codes[request.username]
+
+    # 获取用户信息
+    user = db.fetch_one(
+        """SELECT id, username, nickname, role, permissions, status
+           FROM users WHERE username = ?""",
+        (request.username,)
+    )
+
+    if not user:
+        raise HTTPException(status_code=404, detail="用户不存在")
+
+    user_id, username, nickname, role, permissions, status = user
+
+    # 检查状态
+    if status == "banned":
+        raise HTTPException(status_code=403, detail="账号已被禁用")
+
+    token = generate_token(user_id, username)
+
+    import json
+    perms = json.loads(permissions) if permissions else []
+
+    return {
+        "user_id": user_id,
+        "username": username,
+        "nickname": nickname,
+        "role": role,
+        "permissions": perms,
+        "token": token
     }
