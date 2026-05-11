@@ -4,10 +4,28 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional, List
 import json
+import hashlib
 
 from src.database.db import db
 
 router = APIRouter(prefix="/api/admin/users", tags=["用户管理"])
+
+
+def hash_password(password: str) -> str:
+    return hashlib.sha256(password.encode()).hexdigest()
+
+
+PRD_MODULES = [
+    "map",           # 学习地图
+    "learn",         # 知识点讲解（费曼学习法）
+    "socratic",      # AI帮测（苏格拉底提问）
+    "practice",      # 题目练习
+    "wrong",         # 错题本
+    "report",        # 学习报告
+    "upload",        # 题库上传
+    "question-bank", # 题库管理
+    "ai-qa",         # AI问答
+]
 
 
 class UserResponse(BaseModel):
@@ -32,6 +50,19 @@ class UpdateUserRequest(BaseModel):
     email: Optional[str] = None
     role: Optional[str] = None
     status: Optional[str] = None
+
+
+class CreateUserRequest(BaseModel):
+    username: str
+    password: str
+    nickname: Optional[str] = None
+    email: Optional[str] = None
+    role: Optional[str] = "user"
+    permissions: Optional[List[str]] = None
+
+
+class ResetPasswordRequest(BaseModel):
+    password: str
 
 
 @router.get("/list")
@@ -181,3 +212,64 @@ async def unban_user(user_id: int):
 
     db.execute("UPDATE users SET status = 'active' WHERE id = ?", (user_id,))
     return {"message": "用户已启用"}
+
+
+@router.post("")
+async def create_user(request: CreateUserRequest):
+    """管理员手动添加用户"""
+    # Check if username already exists
+    existing = db.fetch_one(
+        "SELECT id FROM users WHERE username = ?",
+        (request.username,)
+    )
+    if existing:
+        raise HTTPException(status_code=400, detail="用户名已存在")
+
+    # Hash password
+    password_hash = hash_password(request.password)
+
+    # Determine permissions
+    perms = request.permissions or PRD_MODULES
+
+    # Create user
+    nickname = request.nickname or request.username
+    cursor = db.execute(
+        """INSERT INTO users (username, password_hash, nickname, email, role, permissions, status)
+           VALUES (?, ?, ?, ?, ?, ?, 'active')""",
+        (request.username, password_hash, nickname, request.email or "", request.role, json.dumps(perms))
+    )
+
+    user_id = cursor.lastrowid
+
+    # Create permission records
+    for module in perms:
+        db.execute(
+            "INSERT INTO user_permissions (user_id, module) VALUES (?, ?)",
+            (user_id, module)
+        )
+
+    return {
+        "user_id": user_id,
+        "username": request.username,
+        "nickname": nickname,
+        "email": request.email or "",
+        "role": request.role or "user",
+        "permissions": perms,
+        "message": "用户创建成功"
+    }
+
+
+@router.post("/{user_id}/reset-password")
+async def reset_user_password(user_id: int, request: ResetPasswordRequest):
+    """管理员重置用户密码"""
+    existing = db.fetch_one("SELECT id FROM users WHERE id = ?", (user_id,))
+    if not existing:
+        raise HTTPException(status_code=404, detail="用户不存在")
+
+    password_hash = hash_password(request.password)
+    db.execute(
+        "UPDATE users SET password_hash = ? WHERE id = ?",
+        (password_hash, user_id)
+    )
+
+    return {"message": "密码重置成功"}

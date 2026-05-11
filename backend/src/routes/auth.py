@@ -80,14 +80,14 @@ async def register(request: RegisterRequest):
     nickname = request.nickname or request.username
     cursor = db.execute(
         """INSERT INTO users (username, password_hash, nickname, email, role, permissions, status)
-           VALUES (?, ?, ?, ?, 'user', '["map", "learn", "practice", "wrong", "report", "upload", "ai-qa"]', 'active')""",
+           VALUES (?, ?, ?, ?, 'user', '["map","learn","socratic","practice","wrong","report","upload","question-bank","ai-qa"]', 'active')""",
         (request.username, password_hash, nickname, request.email or "")
     )
 
     user_id = cursor.lastrowid
 
-    # Create default permissions
-    default_modules = ["map", "learn", "practice", "wrong", "report", "upload", "ai-qa"]
+    # Create default permissions (匹配 PRD v1.6 模块列表)
+    default_modules = ["map", "learn", "socratic", "practice", "wrong", "report", "upload", "question-bank", "ai-qa"]
     for module in default_modules:
         db.execute(
             "INSERT INTO user_permissions (user_id, module) VALUES (?, ?)",

@@ -6,6 +6,7 @@
     <title>AI伴学系统 - 智能备考助手</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
 </head>
 <body>
     <!-- 主容器 -->
@@ -698,12 +699,12 @@
                         <form id="loginFormNew">
                             <!-- 账号输入 -->
                             <div class="login-input-group">
-                                <input type="text" id="loginUsername" placeholder="请输入手机号/用户名" required>
+                                <input type="text" id="loginUsername" placeholder="请输入手机号/用户名" autocomplete="username" required>
                             </div>
 
                             <!-- 密码输入 (默认显示) -->
                             <div class="login-input-group" id="password-input-group">
-                                <input type="password" id="loginPassword" placeholder="请输入密码">
+                                <input type="password" id="loginPassword" placeholder="请输入密码" autocomplete="current-password">
                             </div>
 
                             <!-- 验证码输入 (默认隐藏) -->
@@ -745,10 +746,10 @@
 
                         <form id="registerFormNew">
                             <div class="login-input-group">
-                                <input type="text" id="regUsername" placeholder="请输入用户名" required>
+                                <input type="text" id="regUsername" placeholder="请输入用户名" autocomplete="username" required>
                             </div>
                             <div class="login-input-group">
-                                <input type="password" id="regPassword" placeholder="请输入密码" required>
+                                <input type="password" id="regPassword" placeholder="请输入密码" autocomplete="new-password" required>
                             </div>
                             <div class="login-input-group">
                                 <input type="text" id="regNickname" placeholder="请输入昵称（可选）">
@@ -800,6 +801,73 @@
         </div>
     </div>
 
+    <!-- 功能授权模态框 -->
+    <div class="auth-modal" id="authModal" style="display: none;">
+        <div class="auth-modal-card">
+            <div class="auth-modal-header">
+                <h3><i class="fas fa-shield-alt"></i> 功能授权</h3>
+                <button class="close-btn" onclick="closeAuthModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="auth-modal-body" id="authModalBody">
+                <p class="empty-hint" id="authUserInfo">加载中...</p>
+                <div id="authModuleList"></div>
+            </div>
+            <div class="auth-modal-footer">
+                <button class="btn btn-outline" onclick="resetAuthDefaults()">重置为默认</button>
+                <button class="btn btn-primary" onclick="saveAuthPermissions()">保存授权</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑用户模态框 -->
+    <div class="auth-modal" id="editUserModal" style="display: none;">
+        <div class="auth-modal-card">
+            <div class="auth-modal-header">
+                <h3><i class="fas fa-edit"></i> 编辑用户</h3>
+                <button class="close-btn" onclick="closeEditUserModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="auth-modal-body">
+                <div class="edit-modal-field">
+                    <label>用户ID</label>
+                    <input type="text" id="editUserId" disabled>
+                </div>
+                <div class="edit-modal-field">
+                    <label>用户名</label>
+                    <input type="text" id="editUsername" disabled>
+                </div>
+                <div class="edit-modal-field">
+                    <label>昵称</label>
+                    <input type="text" id="editNickname" placeholder="请输入昵称">
+                </div>
+                <div class="edit-modal-field">
+                    <label>邮箱</label>
+                    <input type="email" id="editEmail" placeholder="请输入邮箱">
+                </div>
+                <div class="edit-modal-field">
+                    <label>角色</label>
+                    <select id="editRole">
+                        <option value="user">普通用户</option>
+                        <option value="admin">管理员</option>
+                    </select>
+                </div>
+                <div class="edit-modal-field">
+                    <label>状态</label>
+                    <select id="editStatus">
+                        <option value="active">正常</option>
+                        <option value="banned">禁用</option>
+                    </select>
+                </div>
+            </div>
+            <div class="auth-modal-footer">
+                <button class="btn btn-outline" onclick="closeEditUserModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveEditUser()">保存</button>
+            </div>
+        </div>
+    </div>
+
     <script src="js/app.js?v=1.5.6"></script>
 </body>
-</html>

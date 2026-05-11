@@ -1,0 +1,36 @@
+name: 定时健康检查
+
+on:
+  schedule:
+    # 每天北京时间 09:00 执行（UTC 01:00）
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+
+jobs:
+  health-check:
+    name: 🏥 服务健康检查
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🏥 检查生产环境 API
+        if: ${{ vars.PRODUCTION_URL != '' }}
+        run: |
+          RESPONSE=$(curl -sf --max-time 10 "${{ vars.PRODUCTION_URL }}/health" || echo "FAILED")
+          if echo "$RESPONSE" | grep -q '"status"'; then
+            echo "✅ 生产环境正常: $RESPONSE"
+          else
+            echo "❌ 生产环境异常！响应: $RESPONSE"
+            exit 1
+          fi
+
+      - name: 📢 异常时飞书告警
+        if: failure() && vars.FEISHU_WEBHOOK != ''
+        run: |
+          curl -X POST "${{ vars.FEISHU_WEBHOOK }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "msg_type": "text",
+              "content": {
+                "text": "🚨 AI伴学系统 生产环境健康检查失败！\n请及时排查！\n检查时间: '"$(date '+%Y-%m-%d %H:%M:%S')"'"
+              }
+            }' || true

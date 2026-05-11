@@ -1,0 +1,183 @@
+name: CI - 自动构建与测试
+
+on:
+  push:
+    branches: [ main, develop, feature/** ]
+  pull_request:
+    branches: [ main, develop ]
+
+# 并发控制：同分支的旧 CI 自动取消
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ─────────────────────────────────────────────
+  # Job 1: 后端 Python / FastAPI 检测 & 测试
+  # ─────────────────────────────────────────────
+  backend-ci:
+    name: 🐍 Backend CI (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11"]
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: 📥 Checkout 代码
+        uses: actions/checkout@v4
+
+      - name: 🐍 设置 Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: 📦 安装依赖
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          # 安装测试工具
+          pip install pytest pytest-asyncio httpx pytest-cov
+
+      - name: 🔍 代码风格检查 (flake8)
+        run: |
+          pip install flake8
+          # 主代码检查（忽略行长度 E501）
+          flake8 src/ --max-line-length=120 --extend-ignore=E501,W503 --statistics || true
+
+      - name: 🔬 类型检查 (mypy) - 可选
+        run: |
+          pip install mypy || true
+          mypy src/ --ignore-missing-imports --no-strict-optional || true
+
+      - name: 🧪 运行单元测试
+        env:
+          MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
+          FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
+          FEISHU_VERIFICATION_TOKEN: ${{ secrets.FEISHU_VERIFICATION_TOKEN }}
+          DATABASE_PATH: ./database/test_questions.db
+        run: |
+          # 如果存在 tests/ 目录则运行测试
+          if [ -d "tests" ]; then
+            pytest tests/ -v \
+              --cov=src \
+              --cov-report=xml \
+              --cov-report=term-missing \
+              --asyncio-mode=auto
+          else
+            echo "⚠️ 暂无 tests/ 目录，跳过单元测试"
+          fi
+
+      - name: 📊 上传覆盖率报告
+        if: matrix.python-version == '3.11' && hashFiles('backend/coverage.xml') != ''
+        uses: codecov/codecov-action@v4
+        with:
+          file: backend/coverage.xml
+          flags: backend
+          name: backend-coverage
+
+      - name: 🚀 启动后端健康检查
+        env:
+          DATABASE_PATH: ./database/ci_test.db
+          MINIMAX_API_KEY: dummy_key_for_ci
+          DEEPSEEK_API_KEY: dummy_key_for_ci
+          FEISHU_APP_ID: dummy
+          FEISHU_APP_SECRET: dummy
+          FEISHU_VERIFICATION_TOKEN: dummy
+        run: |
+          python run.py &
+          BACKEND_PID=$!
+          echo "Backend PID: $BACKEND_PID"
+          # 等待后端启动（最多 30 秒）
+          for i in $(seq 1 30); do
+            if curl -sf http://127.0.0.1:5001/health > /dev/null 2>&1; then
+              echo "✅ 后端健康检查通过"
+              break
+            fi
+            echo "等待后端启动... ($i/30)"
+            sleep 1
+          done
+          # 最终验证
+          curl -sf http://127.0.0.1:5001/health || (echo "❌ 后端启动失败" && exit 1)
+          kill $BACKEND_PID || true
+
+  # ─────────────────────────────────────────────
+  # Job 2: 前端静态文件检查
+  # ─────────────────────────────────────────────
+  frontend-ci:
+    name: 🌐 Frontend CI
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout 代码
+        uses: actions/checkout@v4
+
+      - name: 🔍 检查前端文件结构
+        run: |
+          echo "=== 前端文件结构 ==="
+          ls -la frontend/
+          test -f frontend/index.html || (echo "❌ 缺少 frontend/index.html" && exit 1)
+          echo "✅ 前端文件检查通过"
+
+      - name: 🔎 HTML 语法验证
+        run: |
+          # 使用 tidy 检查 HTML（如可用）
+          if command -v tidy &> /dev/null; then
+            tidy -errors -quiet -utf8 frontend/index.html || true
+          else
+            echo "tidy 不可用，跳过 HTML 验证"
+          fi
+
+      - name: 🎨 CSS/JS 文件检查
+        run: |
+          echo "=== CSS 文件 ==="
+          find frontend/ -name "*.css" -exec echo "  Found: {}" \;
+          echo "=== JS 文件 ==="
+          find frontend/ -name "*.js" -exec echo "  Found: {}" \;
+
+  # ─────────────────────────────────────────────
+  # Job 3: 安全扫描
+  # ─────────────────────────────────────────────
+  security-scan:
+    name: 🔐 安全扫描
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout 代码
+        uses: actions/checkout@v4
+
+      - name: 🐍 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: 🔐 依赖漏洞扫描 (pip-audit)
+        working-directory: backend
+        run: |
+          pip install pip-audit
+          pip install -r requirements.txt
+          pip-audit --requirement requirements.txt --output-format json || true
+
+      - name: 🕵️ 敏感信息检测 (gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: 🛡️ 检查 .env 文件未被提交
+        run: |
+          if git ls-files --error-unmatch backend/.env 2>/dev/null; then
+            echo "❌ 警告：.env 文件已被 Git 追踪！请立即从 Git 历史中移除！"
+            exit 1
+          else
+            echo "✅ .env 文件未被追踪，安全"
+          fi

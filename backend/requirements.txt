@@ -9,6 +9,7 @@ uvicorn==0.27.0
 
 # Database
 # sqlite3 is built-in to Python
+pymysql>=1.1.0
 
 # AI
 aiohttp==3.9.1

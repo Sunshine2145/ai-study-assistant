@@ -1,0 +1,105 @@
+name: PR 检查
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+jobs:
+  # ─────────────────────────────────────────────
+  # PR 快速检查（不需要 Secrets）
+  # ─────────────────────────────────────────────
+  pr-lint:
+    name: 🔍 PR 规范检查
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+
+    steps:
+      - name: 📥 Checkout 代码
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🏷️ 检查 PR 标题规范
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          echo "PR Title: $PR_TITLE"
+          # 检查是否符合约定式提交格式（可选，宽松模式）
+          if echo "$PR_TITLE" | grep -qE "^(feat|fix|docs|style|refactor|test|chore|perf|ci|build)(\(.+\))?!?:"; then
+            echo "✅ PR 标题符合规范"
+          else
+            echo "⚠️ PR 标题建议格式: feat/fix/docs/style/refactor/test/chore: 描述"
+          fi
+
+      - name: 📋 检查变更文件
+        run: |
+          echo "=== 本次 PR 变更文件 ==="
+          git diff --name-only origin/${{ github.base_ref }}...HEAD
+
+      - name: 🐍 Python 依赖变更检测
+        run: |
+          if git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -q "requirements.txt"; then
+            echo "⚠️ requirements.txt 已变更，注意审查依赖更新"
+          fi
+
+  # ─────────────────────────────────────────────
+  # 后端快速测试（PR 专用，仅 Python 3.11）
+  # ─────────────────────────────────────────────
+  pr-backend-test:
+    name: 🧪 后端快速测试
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: 📥 Checkout 代码
+        uses: actions/checkout@v4
+
+      - name: 🐍 设置 Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: 📦 安装依赖
+        run: |
+          pip install -r requirements.txt
+          pip install pytest pytest-asyncio httpx
+
+      - name: 🚀 导入检查（验证模块可正常加载）
+        env:
+          DATABASE_PATH: ./database/ci_test.db
+          MINIMAX_API_KEY: dummy
+          DEEPSEEK_API_KEY: dummy
+          FEISHU_APP_ID: dummy
+          FEISHU_APP_SECRET: dummy
+          FEISHU_VERIFICATION_TOKEN: dummy
+        run: |
+          python -c "
+          import sys
+          sys.path.insert(0, '.')
+          try:
+              from src.config.settings import settings
+              print('✅ settings 加载成功')
+          except Exception as e:
+              print(f'⚠️ settings 加载警告: {e}')
+          "
+
+      - name: 🧪 运行测试（如存在）
+        env:
+          DATABASE_PATH: ./database/ci_test.db
+          MINIMAX_API_KEY: dummy
+          DEEPSEEK_API_KEY: dummy
+          FEISHU_APP_ID: dummy
+          FEISHU_APP_SECRET: dummy
+          FEISHU_VERIFICATION_TOKEN: dummy
+        run: |
+          if [ -d "tests" ]; then
+            pytest tests/ -v --asyncio-mode=auto -x
+          else
+            echo "⚠️ 暂无 tests/ 目录"
+          fi

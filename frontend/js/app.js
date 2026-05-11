@@ -181,6 +181,18 @@ const api = {
     async unbanUser(userId) {
         return await this.request(`/admin/users/${userId}/unban`, { method: 'POST' });
     },
+    async createUser(data) {
+        return await this.request('/admin/users', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    },
+    async resetPassword(userId, password) {
+        return await this.request(`/admin/users/${userId}/reset-password`, {
+            method: 'POST',
+            body: JSON.stringify({ password })
+        });
+    },
     // 上传进度
     async getUploadProgress(uploadId) {
         return await this.request(`/upload/progress/${uploadId}`);
@@ -1486,7 +1498,7 @@ async function doLogin() {
     const password = document.getElementById('loginPassword').value;
 
     if (!username || !password) {
-        alert('请输入用户名和密码');
+        showToast('请输入用户名和密码', 'warning');
         return;
     }
 
@@ -1494,11 +1506,9 @@ async function doLogin() {
     const result = await api.login(username, password);
     console.log('Login result:', result);
     if (result && result.user_id) {
-        localStorage.setItem('user', JSON.stringify(result));
-        loadUserInfo();
-        navigateTo('map');
+        afterLogin(result);
     } else {
-        alert(result?.detail || '登录失败');
+        showToast(result?.detail || '登录失败', 'error');
     }
 }
 
@@ -1510,21 +1520,21 @@ async function doRegister() {
     const nickname = document.getElementById('registerNickname').value.trim();
 
     if (!username || !password) {
-        alert('请输入用户名和密码');
+        showToast('请输入用户名和密码', 'warning');
         return;
     }
 
     if (password !== confirmPassword) {
-        alert('两次密码输入不一致');
+        showToast('两次密码输入不一致', 'warning');
         return;
     }
 
     const result = await api.register(username, password, nickname || username);
     if (result && result.success) {
-        alert('注册成功，请登录');
+        showToast('注册成功，请登录', 'success');
         showLogin();
     } else {
-        alert(result?.message || '注册失败');
+        showToast(result?.message || '注册失败', 'error');
     }
 }
 
@@ -1554,7 +1564,7 @@ function switchLoginTab(type) {
 async function sendLoginCode(btn) {
     const username = document.getElementById('loginUsername').value.trim();
     if (!username) {
-        alert('请先输入手机号/用户名');
+        showToast('请先输入手机号/用户名', 'warning');
         return;
     }
 
@@ -1597,17 +1607,17 @@ async function doLoginNew(event) {
     const isPasswordTab = document.querySelector('.login-tab-item.active').textContent.includes('密码');
 
     if (!username) {
-        alert('请输入手机号/用户名');
+        showToast('请输入手机号/用户名', 'warning');
         return;
     }
 
     if (isPasswordTab && !password) {
-        alert('请输入密码');
+        showToast('请输入密码', 'warning');
         return;
     }
 
     if (!isPasswordTab && !code) {
-        alert('请输入验证码');
+        showToast('请输入验证码', 'warning');
         return;
     }
 
@@ -1628,14 +1638,12 @@ async function doLoginNew(event) {
 
         console.log('Login result:', result);
         if (result && result.user_id) {
-            localStorage.setItem('user', JSON.stringify(result));
-            loadUserInfo();
-            navigateTo('map');
+            afterLogin(result);
         } else {
-            alert(result?.detail || '登录失败');
+            showToast(result?.detail || '登录失败', 'error');
         }
     } catch (error) {
-        alert('登录失败: ' + error.message);
+        showToast('登录失败: ' + error.message, 'error');
     } finally {
         btn.innerText = originalText;
         btn.disabled = false;
@@ -1652,7 +1660,7 @@ async function doRegisterNew(event) {
     const email = document.getElementById('regEmail')?.value.trim();
 
     if (!username || !password) {
-        alert('请输入用户名和密码');
+        showToast('请输入用户名和密码', 'warning');
         return;
     }
 
@@ -1665,13 +1673,13 @@ async function doRegisterNew(event) {
     try {
         const result = await api.register(username, password, nickname || username, email);
         if (result && result.success) {
-            alert('注册成功，请登录');
+            showToast('注册成功，请登录', 'success');
             showLogin();
         } else {
-            alert(result?.message || '注册失败');
+            showToast(result?.message || '注册失败', 'error');
         }
     } catch (error) {
-        alert('注册失败: ' + error.message);
+        showToast('注册失败: ' + error.message, 'error');
     } finally {
         btn.innerText = originalText;
         btn.disabled = false;
@@ -1693,16 +1701,22 @@ async function loadUserManagementData() {
 
     const users = await api.getUserList();
     if (!users || !users.data) {
-        userListEl.innerHTML = '<p class="empty-hint">加载失败</p>';
+        userListEl.innerHTML = '<div class="user-management-toolbar"></div><p class="empty-hint">加载失败</p>';
         return;
     }
+
+    // 工具栏（必须在 users 获取之后）
+    const toolbarHtml = '<div class="user-management-toolbar">' +
+        '<span style="font-size:14px;color:#666;">共 ' + users.data.length + ' 个用户</span>' +
+        '<button class="btn btn-primary btn-sm" onclick="showAddUserDialog()">' +
+        '<i class="fas fa-plus"></i> 添加用户</button></div>';
 
     if (users.data.length === 0) {
-        userListEl.innerHTML = '<p class="empty-hint">暂无用户</p>';
+        userListEl.innerHTML = toolbarHtml + '<p class="empty-hint">暂无用户</p>';
         return;
     }
 
-    userListEl.innerHTML = users.data.map(user => `
+    userListEl.innerHTML = toolbarHtml + users.data.map(user => `
         <div class="user-card">
             <div class="user-info">
                 <div class="user-avatar">${(user.nickname || user.username).charAt(0).toUpperCase()}</div>
@@ -1712,8 +1726,8 @@ async function loadUserManagementData() {
                 </div>
             </div>
             <div class="user-meta">
-                <span class="user-role badge-${user.role}">${user.role === 'admin' ? '管理员' : '用户'}</span>
-                <span class="user-status badge-${user.status}">${user.status === 'active' ? '正常' : '禁用'}</span>
+                <span class="badge-${user.role}">${user.role === 'admin' ? '管理员' : '用户'}</span>
+                <span class="badge-${user.status}">${user.status === 'active' ? '正常' : '禁用'}</span>
             </div>
             <div class="user-stats">
                 <div class="stat-item">
@@ -1727,6 +1741,7 @@ async function loadUserManagementData() {
             </div>
             <div class="user-actions">
                 <button class="btn btn-sm btn-outline" onclick="editUser(${user.id})">编辑</button>
+                <button class="btn btn-sm btn-outline" onclick="openAuthModal(${user.id})">授权</button>
                 ${user.status === 'active'
                     ? `<button class="btn btn-sm btn-outline" onclick="toggleUserStatus(${user.id}, 'ban')">禁用</button>`
                     : `<button class="btn btn-sm btn-primary" onclick="toggleUserStatus(${user.id}, 'unban')">启用</button>`
@@ -1736,33 +1751,208 @@ async function loadUserManagementData() {
     `).join('');
 }
 
-async function editUser(userId) {
+// ── 模块权限常量 ──────────────────────────────────
+
+const PRD_MODULES = [
+    { key: 'map', name: '学习地图', group: '学习相关' },
+    { key: 'learn', name: '知识点讲解（费曼学习法）', group: '学习相关' },
+    { key: 'socratic', name: 'AI帮测（苏格拉底提问）', group: '学习相关' },
+    { key: 'practice', name: '题目练习', group: '学习相关' },
+    { key: 'wrong', name: '错题本', group: '学习相关' },
+    { key: 'report', name: '学习报告', group: '学习相关' },
+    { key: 'upload', name: '题库上传', group: '题库相关' },
+    { key: 'question-bank', name: '题库管理', group: '题库相关' },
+    { key: 'ai-qa', name: 'AI问答', group: 'AI相关' },
+];
+
+const DEFAULT_PERMISSIONS = PRD_MODULES.map(m => m.key);
+
+const PAGE_PERMISSION_MAP = {
+    'home': null,
+    'map': 'map',
+    'learn': 'learn',
+    'practice': 'practice',
+    'wrong': 'wrong',
+    'report': 'report',
+    'upload': 'upload',
+    'question-bank': 'question-bank',
+    'ai-qa': 'ai-qa',
+    'user-management': null,
+    'login': null,
+    'register': null,
+};
+
+// ── 编辑用户模态框 ──────────────────────────────────
+
+async function openEditUserModal(userId) {
     const user = await api.getUserById(userId);
-    if (!user) {
-        alert('用户不存在');
-        return;
-    }
-
-    const newNickname = prompt('请输入新的昵称:', user.nickname || '');
-    if (newNickname === null) return;
-
-    await api.updateUser(userId, { nickname: newNickname });
-    loadUserManagementData();
+    if (!user) { showToast('用户不存在', 'error'); return; }
+    document.getElementById('editUserId').value = user.id;
+    document.getElementById('editUsername').value = user.username;
+    document.getElementById('editNickname').value = user.nickname || '';
+    document.getElementById('editEmail').value = user.email || '';
+    document.getElementById('editRole').value = user.role === 'admin' ? 'admin' : 'user';
+    document.getElementById('editStatus').value = user.status === 'banned' ? 'banned' : 'active';
+    document.getElementById('editUserModal').style.display = 'flex';
 }
 
-async function toggleUserStatus(userId, action) {
-    const confirmMsg = action === 'ban' ? '确定要禁用此用户吗？' : '确定要启用此用户吗？';
-    if (!confirm(confirmMsg)) return;
+function closeEditUserModal() {
+    document.getElementById('editUserModal').style.display = 'none';
+}
 
-    const result = action === 'ban' ? await api.banUser(userId) : await api.unbanUser(userId);
+async function saveEditUser() {
+    const userId = parseInt(document.getElementById('editUserId').value);
+    const data = {
+        nickname: document.getElementById('editNickname').value.trim(),
+        email: document.getElementById('editEmail').value.trim(),
+        role: document.getElementById('editRole').value,
+        status: document.getElementById('editStatus').value,
+    };
+    const result = await api.updateUser(userId, data);
     if (result && result.message) {
+        showToast(result.message, 'success');
+        closeEditUserModal();
         loadUserManagementData();
     }
 }
 
+// ── 功能授权模态框 ──────────────────────────────────
+
+let currentAuthUserId = null;
+let currentAuthPermissions = [];
+
+function openAuthModal(userId) {
+    currentAuthUserId = userId;
+    document.getElementById('authModal').style.display = 'flex';
+    document.getElementById('authUserInfo').textContent = '加载中...';
+    renderAuthModules([]);
+    loadAuthUserData(userId);
+}
+
+function closeAuthModal() {
+    document.getElementById('authModal').style.display = 'none';
+    currentAuthUserId = null;
+    currentAuthPermissions = [];
+}
+
+async function loadAuthUserData(userId) {
+    const user = await api.getUserById(userId);
+    if (!user) { document.getElementById('authUserInfo').textContent = '用户不存在'; return; }
+    document.getElementById('authUserInfo').textContent = '当前用户：' + (user.nickname || user.username);
+    currentAuthPermissions = user.permissions || [];
+    renderAuthModules(currentAuthPermissions);
+}
+
+function renderAuthModules(selectedPerms) {
+    const container = document.getElementById('authModuleList');
+    const groups = [...new Set(PRD_MODULES.map(m => m.group))];
+    container.innerHTML = groups.map(group => {
+        const modules = PRD_MODULES.filter(m => m.group === group);
+        return '<div class="auth-module-group"><h4>' + group + '</h4>' +
+            modules.map(m => {
+                const checked = selectedPerms.includes(m.key) ? 'checked' : '';
+                return '<div class="auth-module-item"><label>' + m.name + '</label>' +
+                    '<label class="auth-toggle">' +
+                    '<input type="checkbox" ' + checked +
+                    ' onchange="toggleAuthModule(\'' + m.key + '\', this.checked)">' +
+                    '<span class="auth-toggle-slider"></span></label></div>';
+            }).join('') + '</div>';
+    }).join('');
+}
+
+function toggleAuthModule(key, checked) {
+    if (checked) {
+        if (!currentAuthPermissions.includes(key)) { currentAuthPermissions.push(key); }
+    } else {
+        currentAuthPermissions = currentAuthPermissions.filter(k => k !== key);
+    }
+}
+
+async function saveAuthPermissions() {
+    if (!currentAuthUserId) return;
+    const result = await api.updateUserPermissions(currentAuthUserId, currentAuthPermissions);
+    if (result && result.message) {
+        showToast(result.message, 'success');
+        closeAuthModal();
+        loadUserManagementData();
+    }
+}
+
+function resetAuthDefaults() {
+    currentAuthPermissions = [...DEFAULT_PERMISSIONS];
+    renderAuthModules(currentAuthPermissions);
+}
+
+// ── 用户管理操作 ──────────────────────────────────
+
+async function editUser(userId) { await openEditUserModal(userId); }
+
+async function toggleUserStatus(userId, action) {
+    const confirmMsg = action === 'ban' ? '确定要禁用此用户吗？' : '确定要启用此用户吗？';
+    if (!confirm(confirmMsg)) return;
+    const result = action === 'ban' ? await api.banUser(userId) : await api.unbanUser(userId);
+    if (result && result.message) {
+        showToast(result.message, 'success');
+        loadUserManagementData();
+    }
+}
+
+// ── 添加用户 ──────────────────────────────────
+
+async function showAddUserDialog() {
+    const username = prompt('请输入新用户的用户名：');
+    if (!username) return;
+    const password = prompt('请输入新用户的密码：');
+    if (!password) return;
+    const nickname = prompt('请输入昵称（可选）：') || username;
+    const email = prompt('请输入邮箱（可选）：') || '';
+    const result = await api.createUser({ username, password, nickname, email });
+    if (result && result.message) {
+        showToast(result.message, 'success');
+        loadUserManagementData();
+    } else {
+        showToast(result?.detail || '添加用户失败', 'error');
+    }
+}
+
+// ── 用户管理导航可见性 ──────────────────────────────────
+
 function showUserManagementNav(role) {
     const nav = document.getElementById('userManagementNav');
-    if (nav) {
-        nav.style.display = role === 'admin' ? 'block' : 'none';
-    }
+    if (nav) { nav.style.display = role === 'admin' ? 'block' : 'none'; }
+}
+
+// ── 导航权限校验 ──────────────────────────────────
+
+function applyNavPermissionCheck() {
+    const userStr = localStorage.getItem('user');
+    if (!userStr) return;
+    let user;
+    try { user = JSON.parse(userStr); } catch { return; }
+    const permissions = user.permissions || [];
+    const role = user.role || 'user';
+    document.querySelectorAll('.nav-item').forEach(item => {
+        const page = item.getAttribute('data-page');
+        if (!page) return;
+        if (page === 'user-management') {
+            item.style.display = role === 'admin' ? '' : 'none';
+            return;
+        }
+        const requiredPerm = PAGE_PERMISSION_MAP[page];
+        if (requiredPerm && !permissions.includes(requiredPerm)) {
+            item.classList.add('nav-disabled');
+            item.title = '该功能未授权，请联系管理员';
+        } else {
+            item.classList.remove('nav-disabled');
+            item.title = '';
+        }
+    });
+}
+
+function afterLogin(userData) {
+    localStorage.setItem('user', JSON.stringify(userData));
+    showUserManagementNav(userData.role);
+    applyNavPermissionCheck();
+    loadUserInfo();
+    navigateTo('map');
 }

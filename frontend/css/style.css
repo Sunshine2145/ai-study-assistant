@@ -292,6 +292,7 @@ body {
 .page-content {
     flex: 1;
     padding: var(--spacing-lg);
+    min-height: 100vh;
     overflow-y: auto;
 }
 
@@ -302,6 +303,11 @@ body {
 
 .page.active {
     display: block;
+}
+
+/* 非登录/注册页面，给固定侧边栏留空间 */
+.page.active:not(#page-login):not(#page-register) {
+    margin-left: 260px;
 }
 
 /* 登录/注册页面层级 */
@@ -2704,5 +2710,238 @@ body {
 
     .knowledge-card .card-body {
         max-height: calc(90vh - 140px);
+    }
+}
+
+/* ── 用户管理 ──────────────────────────────────────── */
+
+.user-management-container {
+    max-width: 900px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.user-management-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.user-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border-color, #eee);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    transition: box-shadow 0.2s;
+}
+
+.user-card:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.user-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary, #667eea), #764ba2);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.user-details { flex: 1; min-width: 0; }
+.user-name { font-weight: 600; font-size: 15px; }
+.user-email { font-size: 12px; color: #999; margin-top: 2px; }
+
+.user-meta { display: flex; gap: 8px; flex-shrink: 0; }
+.user-stats { display: flex; gap: 16px; flex-shrink: 0; }
+.stat-item { text-align: center; }
+.stat-label { display: block; font-size: 11px; color: #999; }
+.stat-value { font-weight: 600; font-size: 14px; }
+
+.user-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+/* badge 颜色 */
+.badge-admin { background: #ff6b6b; color: #fff; padding: 2px 10px; border-radius: 12px; font-size: 12px; }
+.badge-user { background: #667eea; color: #fff; padding: 2px 10px; border-radius: 12px; font-size: 12px; }
+.badge-active { background: #51cf66; color: #fff; padding: 2px 10px; border-radius: 12px; font-size: 12px; }
+.badge-banned { background: #868e96; color: #fff; padding: 2px 10px; border-radius: 12px; font-size: 12px; }
+
+/* ── 功能授权模态框 ──────────────────────────────────── */
+
+.auth-modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.auth-modal-card {
+    background: var(--card-bg, #fff);
+    border-radius: 16px;
+    max-width: 520px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: fadeIn 0.2s ease;
+}
+
+.auth-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color, #eee);
+}
+
+.auth-modal-header h3 { margin: 0; font-size: 18px; }
+
+.auth-modal-body { padding: 20px 24px; }
+
+.auth-module-group { margin-bottom: 20px; }
+
+.auth-module-group h4 {
+    font-size: 13px;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.auth-module-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+}
+
+.auth-module-item label {
+    font-size: 14px;
+    cursor: pointer;
+    flex: 1;
+}
+
+.auth-toggle {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.auth-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.auth-toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #ccc;
+    border-radius: 24px;
+    transition: 0.3s;
+}
+
+.auth-toggle-slider::before {
+    content: "";
+    position: absolute;
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+.auth-toggle input:checked + .auth-toggle-slider {
+    background: var(--primary, #667eea);
+}
+
+.auth-toggle input:checked + .auth-toggle-slider::before {
+    transform: translateX(20px);
+}
+
+.auth-modal-footer {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    padding: 16px 24px;
+    border-top: 1px solid var(--border-color, #eee);
+}
+
+/* ── 编辑用户模态框 ──────────────────────────────────── */
+
+.edit-modal-field {
+    margin-bottom: 16px;
+}
+
+.edit-modal-field label {
+    display: block;
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+.edit-modal-field input,
+.edit-modal-field select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    background: var(--card-bg, #fff);
+    color: var(--text-color, #333);
+}
+
+.edit-modal-field input:focus,
+.edit-modal-field select:focus {
+    outline: none;
+    border-color: var(--primary, #667eea);
+    box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+}
+
+/* ── 导航权限禁用样式 ──────────────────────────────────── */
+
+.nav-item.nav-disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ── 响应式 ──────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+    .user-card {
+        flex-wrap: wrap;
+    }
+    .user-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    .auth-modal-card {
+        max-width: 100%;
+        margin: 10px;
     }
 }

@@ -2,7 +2,7 @@
 
 import os
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
@@ -26,6 +26,14 @@ class DatabaseConfig(BaseModel):
     path: str = os.getenv("DATABASE_PATH", "./database/questions.db")
 
 
+class MySQLDatabaseConfig(BaseModel):
+    host: str = os.getenv("MYSQL_HOST", "192.168.101.2")
+    port: int = int(os.getenv("MYSQL_PORT", "3306"))
+    database: str = os.getenv("MYSQL_DATABASE", "ai_study_assistant")
+    user: str = os.getenv("MYSQL_USER", "ai_data")
+    password: str = os.getenv("MYSQL_PASSWORD", "Xdzhzl2024")
+
+
 class AIConfig(BaseModel):
     api_key: str = os.getenv("MINIMAX_API_KEY", "")
     model: str = "MiniMax-M2.5-highspeed"
@@ -46,9 +54,11 @@ class Settings(BaseModel):
     app: AppConfig = AppConfig()
     feishu: FeishuConfig = FeishuConfig()
     database: DatabaseConfig = DatabaseConfig()
+    mysql: MySQLDatabaseConfig = MySQLDatabaseConfig()
     ai: AIConfig = AIConfig()
     deepseek: DeepSeekConfig = DeepSeekConfig()
     reminder: ReminderConfig = ReminderConfig()
+    db_type: str = os.getenv("DB_TYPE", "sqlite")
 
 
 settings = Settings()

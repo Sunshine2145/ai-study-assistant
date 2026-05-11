@@ -1,0 +1,43 @@
+# .dockerignore - Docker 构建忽略文件
+
+# 环境变量（绝对不能进镜像）
+.env
+.env.*
+
+# Python 缓存
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyc
+
+# 数据库文件（运行时动态生成）
+database/*.db
+database/*.sqlite
+
+# 虚拟环境
+venv/
+.venv/
+env/
+
+# 测试相关
+tests/
+*.test.py
+.pytest_cache/
+coverage.xml
+.coverage
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# 日志
+*.log
+logs/
+
+# 截图（测试用）
+*.png
+.playwright-cli/
