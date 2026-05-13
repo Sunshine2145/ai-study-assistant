@@ -10,7 +10,9 @@
       "Bash(git config *)",
       "Bash(git ls-tree *)",
       "Bash(rm -rf backend/.git frontend/.git)",
-      "Bash(git reset *)"
+      "Bash(git reset *)",
+      "Bash(git rm *)",
+      "Bash(git checkout *)"
     ]
   }
 }

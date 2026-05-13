@@ -1,0 +1,329 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - generic [ref=e6]: 
+          - generic [ref=e7]: AI伴学
+        - text: 
+      - navigation [ref=e8]:
+        - link " 学习首页" [ref=e9] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e10]: 
+          - generic [ref=e11]: 学习首页
+        - link " 学习地图" [active] [ref=e12] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e13]: 
+          - generic [ref=e14]: 学习地图
+        - link " 开始学习" [ref=e15] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e16]: 
+          - generic [ref=e17]: 开始学习
+        - link " 题目练习" [ref=e18] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e19]: 
+          - generic [ref=e20]: 题目练习
+        - link " 错题本" [ref=e21] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e22]: 
+          - generic [ref=e23]: 错题本
+        - link " 学习报告" [ref=e24] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e25]: 
+          - generic [ref=e26]: 学习报告
+        - link " 题库上传" [ref=e27] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e28]: 
+          - generic [ref=e29]: 题库上传
+        - link " 题库管理" [ref=e30] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e31]: 
+          - generic [ref=e32]: 题库管理
+      - generic [ref=e34]:
+        - generic [ref=e36]: 
+        - generic [ref=e37]:
+          - generic [ref=e38]: 谭晓磊
+          - generic [ref=e39]:
+            - generic [ref=e40]:
+              - generic [ref=e41]: 
+              - text: 0天
+            - generic [ref=e42]:
+              - generic [ref=e43]: 
+              - text: 0分
+    - main [ref=e44]:
+      - generic [ref=e45]:
+        - text: 
+        - generic [ref=e46]: 学习地图
+        - generic [ref=e47]:
+          - button " 3" [ref=e352] [cursor=pointer]:
+            - generic [ref=e49]: 
+            - generic [ref=e50]: "3"
+          - button "" [ref=e51] [cursor=pointer]:
+            - generic [ref=e52]: 
+      - generic [ref=e53]:
+        - text:               
+        - generic [ref=e55]:
+          - generic [ref=e56]:
+            - button "第一阶段" [ref=e1047] [cursor=pointer]
+            - button "第二阶段" [ref=e1048] [cursor=pointer]
+            - button "第三阶段" [ref=e1049] [cursor=pointer]
+            - button "第四阶段" [ref=e1050] [cursor=pointer]
+            - button "第五阶段" [ref=e1051] [cursor=pointer]
+            - button "第六阶段" [ref=e1052] [cursor=pointer]
+            - button "第七阶段" [ref=e1053] [cursor=pointer]
+            - button "第八阶段" [ref=e1054] [cursor=pointer]
+          - generic [ref=e57]:
+            - heading "第一阶段：计算机基础" [level=2] [ref=e70]
+            - paragraph [ref=e59]: 共31个知识点
+            - generic [ref=e61]: 已完成 1/31 知识点 (3%)
+          - generic [ref=e72]:
+            - generic [ref=e1055]:
+              - generic [ref=e1057]: 
+              - generic [ref=e1058]:
+                - heading "1.1 计算机系统概述" [level=4] [ref=e1059]
+                - paragraph [ref=e1060]: ✅ 已掌握
+              - button " 复习" [ref=e1062] [cursor=pointer]:
+                - generic [ref=e1063]: 
+                - text: 复习
+            - generic [ref=e1064]:
+              - generic [ref=e1066]: 
+              - generic [ref=e1067]:
+                - heading "1.2.1 冯·诺依曼计算机结构" [level=4] [ref=e1068]
+                - paragraph [ref=e1069]: 📚 待学习
+              - button " 学习" [ref=e1071] [cursor=pointer]:
+                - generic [ref=e1072]: 
+                - text: 学习
+            - generic [ref=e1073]:
+              - generic [ref=e1075]: 
+              - generic [ref=e1076]:
+                - heading "1.2.2 处理器（CPU、GPU、DSP、FPGA、国产芯片）" [level=4] [ref=e1077]
+                - paragraph [ref=e1078]: 🔒 需先完成前置知识
+              - button " 未解锁" [disabled] [ref=e1080]:
+                - generic [ref=e1081]: 
+                - text: 未解锁
+            - generic [ref=e1082]:
+              - generic [ref=e1084]: 
+              - generic [ref=e1085]:
+                - heading "1.2.3 指令集（CISC和RISC）" [level=4] [ref=e1086]
+                - paragraph [ref=e1087]: 🔒 需先完成前置知识
+              - button " 未解锁" [disabled] [ref=e1089]:
+                - generic [ref=e1090]: 
+                - text: 未解锁
+            - generic [ref=e1091]:
+              - generic [ref=e1093]: 
+              - generic [ref=e1094]:
+                - heading "1.2.4 存储器（片上缓存、片外缓存、主存、外存）" [level=4] [ref=e1095]
+                - paragraph [ref=e1096]: 🔒 需先完成前置知识
+              - button " 未解锁" [disabled] [ref=e1098]:
+                - generic [ref=e1099]: 
+                - text: 未解锁
+            - generic [ref=e1100]:
+              - generic [ref=e1102]: 
+              - generic [ref=e1103]:
+                - heading "1.2.5 总线（内总线、系统总线、外部总线）" [level=4] [ref=e1104]
+                - paragraph [ref=e1105]: 🔒 需先完成前置知识
+              - button " 未解锁" [disabled] [ref=e1107]:
+                - generic [ref=e1108]: 
+                - text: 未解锁
+            - generic [ref=e1109]:
+              - generic [ref=e1111]: 
+              - generic [ref=e1112]:
+                - heading "1.2.6 接口（显示、音频、网络、SATA）" [level=4] [ref=e1113]
+                - paragraph [ref=e1114]: 🔒 需先完成前置知识
+              - button " 未解锁" [disabled] [ref=e1116]:
+                - generic [ref=e1117]: 
+                - text: 未解锁
+            - generic [ref=e1118]:
+              - generic [ref=e1120]: 
+              - generic [ref=e1121]:
+                - heading "1.3.1 操作系统（组成、类型、特点原理）" [level=4] [ref=e1122]
+                - paragraph [ref=e1123]: 🔒 需先完成前置知识
+              - button " 未解锁" [disabled] [ref=e1125]:
+                - generic [ref=e1126]: 
+                - text: 未解锁
+            - generic [ref=e1127]:
+              - generic [ref=e1129]: 
+              - generic [ref=e1130]:
+                - heading "1.3.2 批处理/分时/网络/分布式操作系统" [level=4] [ref=e1131]
+                - paragraph [ref=e1132]: 🔒 需先完成前置知识
+              - button " 未解锁" [disabled] [ref=e1134]:
+                - generic [ref=e1135]: 
+                - text: 未解锁
+            - generic [ref=e1136]:
+              - generic [ref=e1138]: 
+              - generic [ref=e1139]:
+                - heading "1.3.3 嵌入式操作系统与实时操作系统" [level=4] [ref=e1140]
+                - paragraph [ref=e1141]: 🔒 需先完成前置知识
+              - button " 未解锁" [disabled] [ref=e1143]:
+                - generic [ref=e1144]: 
+                - text: 未解锁
+            - generic [ref=e1145]:
+              - generic [ref=e1147]: 
+              - generic [ref=e1148]:
+                - heading "1.3.4 数据库系统（关系型、分布式）" [level=4] [ref=e1149]
+                - paragraph [ref=e1150]: 🔒 需先完成前置知识
+              - button " 未解锁" [disabled] [ref=e1152]:
+                - generic [ref=e1153]: 
+                - text: 未解锁
+            - generic [ref=e1154]:
+              - generic [ref=e1156]: 
+              - generic [ref=e1157]:
+                - heading "1.3.5 文件系统（类型、原理、存取方式）" [level=4] [ref=e1158]
+                - paragraph [ref=e1159]: 🔒 需先完成前置知识
+              - button " 未解锁" [disabled] [ref=e1161]:
+                - generic [ref=e1162]: 
+                - text: 未解锁
+            - generic [ref=e1163]:
+              - generic [ref=e1165]: 
+              - generic [ref=e1166]:
+                - heading "1.3.6 网络协议（LAN、WAN、无线网、移动通信网）" [level=4] [ref=e1167]
+                - paragraph [ref=e1168]: 🔒 需先完成前置知识
+              - button " 未解锁" [disabled] [ref=e1170]:
+                - generic [ref=e1171]: 
+                - text: 未解锁
+            - generic [ref=e1172]:
+              - generic [ref=e1174]: 
+              - generic [ref=e1175]:
+                - heading "1.3.7 中间件（MQ Series、Tuxedo）" [level=4] [ref=e1176]
+                - paragraph [ref=e1177]: 🔒 需先完成前置知识
+              - button " 未解锁" [disabled] [ref=e1179]:
+                - generic [ref=e1180]: 
+                - text: 未解锁
+            - generic [ref=e1181]:
+              - generic [ref=e1183]: 
+              - generic [ref=e1184]:
+                - heading "1.3.8 软件构件（CORBA、J2EE、DNA2000）" [level=4] [ref=e1185]
+                - paragraph [ref=e1186]: 🔒 需先完成前置知识
+              - button " 未解锁" [disabled] [ref=e1188]:
+                - generic [ref=e1189]: 
+                - text: 未解锁
+            - generic [ref=e1190]:
+              - generic [ref=e1192]: 
+              - generic [ref=e1193]:
+                - heading "1.4.1 嵌入式系统组成及特点" [level=4] [ref=e1194]
+                - paragraph [ref=e1195]: 🔒 需先完成前置知识
+              - button " 未解锁" [disabled] [ref=e1197]:
+                - generic [ref=e1198]: 
+                - text: 未解锁
+            - generic [ref=e1199]:
+              - generic [ref=e1201]: 
+              - generic [ref=e1202]:
+                - heading "1.4.2 实时系统分类（强实时/弱实时/安全攸关）" [level=4] [ref=e1203]
+                - paragraph [ref=e1204]: 🔒 需先完成前置知识
+              - button " 未解锁" [disabled] [ref=e1206]:
+                - generic [ref=e1207]: 
+                - text: 未解锁
+            - generic [ref=e1208]:
+              - generic [ref=e1210]: 
+              - generic [ref=e1211]:
+                - heading "1.4.3 嵌入式软件开发方法" [level=4] [ref=e1212]
+                - paragraph [ref=e1213]: 🔒 需先完成前置知识
+              - button " 未解锁" [disabled] [ref=e1215]:
+                - generic [ref=e1216]: 
+                - text: 未解锁
+            - generic [ref=e1217]:
+              - generic [ref=e1219]: 
+              - generic [ref=e1220]:
+                - heading "1.4.4 安全攸关软件安全性设计（DO-178）" [level=4] [ref=e1221]
+                - paragraph [ref=e1222]: 🔒 需先完成前置知识
+              - button " 未解锁" [disabled] [ref=e1224]:
+                - generic [ref=e1225]: 
+                - text: 未解锁
+            - generic [ref=e1226]:
+              - generic [ref=e1228]: 
+              - generic [ref=e1229]:
+                - heading "1.5.1 网络基本概念（四阶段、基本功能、指标）" [level=4] [ref=e1230]
+                - paragraph [ref=e1231]: 🔒 需先完成前置知识
+              - button " 未解锁" [disabled] [ref=e1233]:
+                - generic [ref=e1234]: 
+                - text: 未解锁
+            - generic [ref=e1235]:
+              - generic [ref=e1237]: 
+              - generic [ref=e1238]:
+                - heading "1.5.2 通信技术（信道、信号、复用、5G）" [level=4] [ref=e1239]
+                - paragraph [ref=e1240]: 🔒 需先完成前置知识
+              - button " 未解锁" [disabled] [ref=e1242]:
+                - generic [ref=e1243]: 
+                - text: 未解锁
+            - generic [ref=e1244]:
+              - generic [ref=e1246]: 
+              - generic [ref=e1247]:
+                - heading "1.5.3 网络技术（LAN、WLAN、WAN、MAN、移动网）" [level=4] [ref=e1248]
+                - paragraph [ref=e1249]: 🔒 需先完成前置知识
+              - button " 未解锁" [disabled] [ref=e1251]:
+                - generic [ref=e1252]: 
+                - text: 未解锁
+            - generic [ref=e1253]:
+              - generic [ref=e1255]: 
+              - generic [ref=e1256]:
+                - heading "1.5.4 组网技术（OSI/RM、TCP/IP协议集）" [level=4] [ref=e1257]
+                - paragraph [ref=e1258]: 🔒 需先完成前置知识
+              - button " 未解锁" [disabled] [ref=e1260]:
+                - generic [ref=e1261]: 
+                - text: 未解锁
+            - generic [ref=e1262]:
+              - generic [ref=e1264]: 
+              - generic [ref=e1265]:
+                - heading "1.5.5 网络工程（规划、设计、实施）" [level=4] [ref=e1266]
+                - paragraph [ref=e1267]: 🔒 需先完成前置知识
+              - button " 未解锁" [disabled] [ref=e1269]:
+                - generic [ref=e1270]: 
+                - text: 未解锁
+            - generic [ref=e1271]:
+              - generic [ref=e1273]: 
+              - generic [ref=e1274]:
+                - heading "1.6.1 机器语言与汇编语言" [level=4] [ref=e1275]
+                - paragraph [ref=e1276]: 🔒 需先完成前置知识
+              - button " 未解锁" [disabled] [ref=e1278]:
+                - generic [ref=e1279]: 
+                - text: 未解锁
+            - generic [ref=e1280]:
+              - generic [ref=e1282]: 
+              - generic [ref=e1283]:
+                - heading "1.6.2 高级语言（C、C++、Java、Python）" [level=4] [ref=e1284]
+                - paragraph [ref=e1285]: 🔒 需先完成前置知识
+              - button " 未解锁" [disabled] [ref=e1287]:
+                - generic [ref=e1288]: 
+                - text: 未解锁
+            - generic [ref=e1289]:
+              - generic [ref=e1291]: 
+              - generic [ref=e1292]:
+                - heading "1.6.3 建模语言（UML组成、关系、五种视图）" [level=4] [ref=e1293]
+                - paragraph [ref=e1294]: 🔒 需先完成前置知识
+              - button " 未解锁" [disabled] [ref=e1296]:
+                - generic [ref=e1297]: 
+                - text: 未解锁
+            - generic [ref=e1298]:
+              - generic [ref=e1300]: 
+              - generic [ref=e1301]:
+                - heading "1.6.4 形式化语言（Z语言）" [level=4] [ref=e1302]
+                - paragraph [ref=e1303]: 🔒 需先完成前置知识
+              - button " 未解锁" [disabled] [ref=e1305]:
+                - generic [ref=e1306]: 
+                - text: 未解锁
+            - generic [ref=e1307]:
+              - generic [ref=e1309]: 
+              - generic [ref=e1310]:
+                - heading "1.7 多媒体概述、视音频技术、数据压缩、VR/AR" [level=4] [ref=e1311]
+                - paragraph [ref=e1312]: 🔒 需先完成前置知识
+              - button " 未解锁" [disabled] [ref=e1314]:
+                - generic [ref=e1315]: 
+                - text: 未解锁
+            - generic [ref=e1316]:
+              - generic [ref=e1318]: 
+              - generic [ref=e1319]:
+                - heading "1.8 霍尔三维结构、切克兰德方法、并行工程、MBSE" [level=4] [ref=e1320]
+                - paragraph [ref=e1321]: 🔒 需先完成前置知识
+              - button " 未解锁" [disabled] [ref=e1323]:
+                - generic [ref=e1324]: 
+                - text: 未解锁
+            - generic [ref=e1325]:
+              - generic [ref=e1327]: 
+              - generic [ref=e1328]:
+                - heading "1.9 性能指标、Amdahl解决方案、负载均衡、性能评估" [level=4] [ref=e1329]
+                - paragraph [ref=e1330]: 🔒 需先完成前置知识
+              - button " 未解锁" [disabled] [ref=e1332]:
+                - generic [ref=e1333]: 
+                - text: 未解锁
+        - text:                   ✓ ✓ ✓  ✓ ✓ ✓  ✓ ✓  ✓             + +                    
+  - text:     

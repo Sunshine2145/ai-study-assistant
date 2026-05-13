@@ -12,7 +12,10 @@
 | 答案解析 | 详细解析，不只告诉对错 |
 | 题库导入 | 支持PDF/TXT/JSON/MD格式，AI智能解析 |
 | 题库管理 | 查看题库列表、题目、筛选、审核 |
+| 上传进度 | 实时显示文件上传和解析进度 |
 | 学习进度追踪 | 掌握度百分比、连续天数、积分 |
+| 用户管理 | 注册登录、角色权限管理（管理员/用户） |
+| AI问答 | 智能问答助手，解答学习疑问 |
 
 ## 学习流程
 
@@ -65,13 +68,18 @@ ai-study-assistant/
 │   │       ├── chat.py        # 对话
 │   │       ├── questions.py   # 题目
 │   │       ├── question_bank.py  # 题库管理
-│   │       └── upload.py      # 题库上传
+│   │       ├── upload.py      # 题库上传
+│   │       ├── ai_qa.py      # AI问答
+│   │       ├── auth.py       # 用户认证
+│   │       ├── admin_user.py  # 用户管理
+│   │       └── upload_progress.py # 上传进度
 │   └── requirements.txt
 ├── frontend/                    # 前端
 │   ├── index.html             # 主页面
 │   ├── css/style.css          # 样式
 │   └── js/app.js              # 主逻辑
-└── AI伴学系统_PRD_v1.0.md      # 产品需求文档
+├── AI伴学系统_PRD_v1.0.md      # 产品需求文档
+└── README.md                  # 项目文档
 ```
 
 ## 快速开始
@@ -103,15 +111,15 @@ cp backend/.env.example backend/.env
 ```bash
 cd backend
 python -m src.main
-# 服务运行在 http://localhost:8081
+# 服务运行在 http://localhost:5001
 ```
 
 ### 4. 启动前端服务
 
 ```bash
 cd frontend
-npx serve -l 3000
-# 访问 http://localhost:3000
+npx serve -l 5000
+# 访问 http://localhost:5000
 ```
 
 ## 技术栈
@@ -157,6 +165,42 @@ npx serve -l 3000
 | `/api/answers` | POST | 提交答案 |
 | `/api/wrong-questions` | GET | 获取错题本 |
 
+### 用户认证
+
+| 接口 | 方法 | 说明 |
+|------|------|------|
+| `/api/auth/register` | POST | 用户注册 |
+| `/api/auth/login` | POST | 用户登录 |
+| `/api/auth/current` | GET | 获取当前用户信息 |
+| `/api/auth/me` | GET | 获取当前用户（简化版） |
+
+### 用户管理（管理员）
+
+| 接口 | 方法 | 说明 |
+|------|------|------|
+| `/api/admin/users/list` | GET | 获取用户列表 |
+| `/api/admin/users/{user_id}` | GET | 获取指定用户 |
+| `/api/admin/users/{user_id}` | PUT | 更新用户信息 |
+| `/api/admin/users/{user_id}/permissions` | PUT | 更新用户权限 |
+| `/api/admin/users/{user_id}/ban` | POST | 禁用用户 |
+| `/api/admin/users/{user_id}/unban` | POST | 启用用户 |
+
+### 上传进度
+
+| 接口 | 方法 | 说明 |
+|------|------|------|
+| `/api/upload/progress` | POST | 创建上传任务 |
+| `/api/upload/progress/{id}` | GET | 获取上传进度 |
+| `/api/upload/progress/{id}` | PUT | 更新上传进度 |
+
+### AI问答
+
+| 接口 | 方法 | 说明 |
+|------|------|------|
+| `/api/ai-qa/chat` | POST | 发送AI问答消息 |
+| `/api/ai-qa/history` | GET | 获取对话历史 |
+| `/api/ai-qa/clear` | POST | 清除对话历史 |
+
 ## 数据库表结构
 
 ### learning_progress（学习进度表）
@@ -185,6 +229,44 @@ npx serve -l 3000
 | knowledge_point | TEXT | 知识点标签 |
 | source | TEXT | 来源 |
 | status | TEXT | 状态：pending/approved |
+
+### users（用户表 - 扩展）
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| id | INTEGER | 主键 |
+| username | VARCHAR(50) | 用户名（唯一） |
+| password_hash | VARCHAR(255) | 密码哈希 |
+| nickname | VARCHAR(50) | 昵称 |
+| email | VARCHAR(255) | 邮箱 |
+| role | VARCHAR(20) | 角色：admin/user |
+| permissions | TEXT | 权限JSON数组 |
+| status | VARCHAR(20) | 状态：active/banned |
+| score | INTEGER | 积分 |
+| streak | INTEGER | 连续学习天数 |
+
+### user_permissions（用户权限表）
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| id | INTEGER | 主键 |
+| user_id | INTEGER | 用户ID |
+| module | VARCHAR(50) | 功能模块名 |
+
+### upload_progress（上传进度表）
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| id | INTEGER | 主键 |
+| user_id | INTEGER | 用户ID |
+| file_name | VARCHAR(255) | 文件名 |
+| file_size | INTEGER | 文件大小 |
+| status | VARCHAR(20) | 状态：processing/completed/failed |
+| progress | INTEGER | 进度百分比 |
+| stage | VARCHAR(50) | 当前阶段 |
+| total_questions | INTEGER | 总题目数 |
+| processed_questions | INTEGER | 已处理题目数 |
+| error_message | TEXT | 错误信息 |
 
 ## 题目上传格式
 
@@ -270,11 +352,22 @@ pymupdf>=1.23.0
 
 ```bash
 # 后端健康检查
-curl http://localhost:8081/health
+curl http://localhost:5001/health
 
 # 前端访问
-curl http://localhost:3000
+curl http://localhost:5000
 ```
+
+## 常见问题
+
+### Q: 如何修改端口？
+A: 后端端口在 `backend/src/main.py` 中修改 `uvicorn.run(port=5001)`；前端使用 `npx serve -l <端口号>`
+
+### Q: 默认管理员账号？
+A: 首次启动后，使用用户名 `tanxiaolei`，密码 `admin123` 登录，角色为管理员
+
+### Q: 如何添加新用户？
+A: 在登录页面点击"注册新账号"进行注册，管理员可在用户管理页面分配权限
 
 ## 许可证
 

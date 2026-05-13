@@ -1,0 +1,173 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - generic [ref=e6]: 
+          - generic [ref=e7]: AI伴学
+        - text: 
+      - navigation [ref=e8]:
+        - link " 学习首页" [ref=e9] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e10]: 
+          - generic [ref=e11]: 学习首页
+        - link " 学习地图" [ref=e12] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e13]: 
+          - generic [ref=e14]: 学习地图
+        - link " 开始学习" [ref=e15] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e16]: 
+          - generic [ref=e17]: 开始学习
+        - link " 题目练习" [ref=e18] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e19]: 
+          - generic [ref=e20]: 题目练习
+        - link " 错题本" [ref=e21] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e22]: 
+          - generic [ref=e23]: 错题本
+        - link " 学习报告" [ref=e24] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e25]: 
+          - generic [ref=e26]: 学习报告
+        - link " 题库上传" [ref=e27] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e28]: 
+          - generic [ref=e29]: 题库上传
+        - link " 题库管理" [ref=e30] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e31]: 
+          - generic [ref=e32]: 题库管理
+      - generic [ref=e34]:
+        - generic [ref=e36]: 
+        - generic [ref=e37]:
+          - generic [ref=e38]: 谭晓磊
+          - generic [ref=e39]:
+            - generic [ref=e40]:
+              - generic [ref=e41]: 
+              - text: 0天
+            - generic [ref=e42]:
+              - generic [ref=e43]: 
+              - text: 0分
+    - main [ref=e44]:
+      - generic [ref=e45]:
+        - text: 
+        - generic [ref=e46]: 学习首页
+        - generic [ref=e47]:
+          - button " 3" [ref=e351] [cursor=pointer]:
+            - generic [ref=e49]: 
+            - generic [ref=e50]: "3"
+          - button "" [ref=e51] [cursor=pointer]:
+            - generic [ref=e52]: 
+      - generic [ref=e53]:
+        - text:                                                                          
+        - generic [ref=e419]:
+          - generic [ref=e420]:
+            - heading " AI问答" [level=2] [ref=e421]:
+              - generic [ref=e422]: 
+              - text: AI问答
+            - paragraph [ref=e423]: 随时提问，AI即时解答学习疑问
+          - generic [ref=e424]:
+            - generic [ref=e425]:
+              - generic [ref=e426]:
+                - generic [ref=e428]: 
+                - generic [ref=e429]:
+                  - generic [ref=e430]: AI伴学助手
+                  - generic [ref=e431]:
+                    - paragraph [ref=e432]: 你好！我是AI学习助手 👋
+                    - paragraph [ref=e433]: 你可以问我任何关于学习的问题，我会尽力帮你解答。
+                    - paragraph [ref=e434]:
+                      - text: 试试问我：
+                      - strong [ref=e435]: 什么是Cache？
+                      - text: 或
+                      - strong [ref=e436]: 解释一下冯诺依曼结构
+                  - generic [ref=e437]: 刚刚
+              - generic [ref=e443]:
+                - generic [ref=e444]:
+                  - generic [ref=e445]: 什么是Cache？
+                  - generic [ref=e446]: 08:44
+                - generic [ref=e448]: 
+              - generic [ref=e456]:
+                - generic [ref=e458]: 
+                - generic [ref=e459]:
+                  - generic [ref=e460]: AI伴学助手
+                  - generic [ref=e461]:
+                    - text: 🎯 AI问答
+                    - generic [ref=e462]:
+                      - text: 用户希望我使用费曼学习法来解释"什么是Cache（缓存）"这个概念。让我按照要求来组织回答：
+                      - text: 1. 先确认用户的疑问点
+                      - text: 2. 用生活化类比解释（避免术语堆砌）
+                      - text: 3. 层层递进，从已知到未知
+                      - text: 4. 识别并加粗标注关键知识点
+                      - text: 5. 引导用户思考
+                      - text: 6. 鼓励追问
+                      - text: 格式要求：
+                      - text: "- 用emoji增强可读性"
+                      - text: "- 段落清晰，逻辑递进"
+                      - text: "- 关键知识点用加粗标注"
+                      - text: 让我用生活化的例子来解释Cache（缓存）这个概念：
+                      - text: 类比1：厨房的例子
+                      - text: 想象你是一个厨师，你把常用调料放在灶台旁边（缓存），这样随时都能拿到。做菜就很快。但如果你每次做菜都要去储藏室拿调料，那就很慢了。
+                      - text: 类比2：书桌的例子
+                      - text: 你把正在读的书放在书桌上（缓存），而不是放在书架上。这样你翻书的时候很快，不用每次都去书架找。
+                      - text: 类比3：大脑记忆
+                      - text: 你记住常用的电话号码（缓存），不用每次都查通讯录。
+                      - text: 让我组织一个清晰、有逻辑的回答。
+                    - text: "# 🔍 什么是 Cache？"
+                    - text: "## 🎯 先确认你的疑问"
+                    - text: 你可能遇到过这样的情况：
+                    - text: "> \"听说电脑有Cache、手机有Cache、浏览器也有Cache...到底是个啥？\""
+                    - text: 别急！今天用最简单的方式，让你完全搞懂它！👇
+                    - text: "---"
+                    - text: "## 🍳 从厨房说起"
+                    - text: 想象你在做一顿大餐 🍳
+                    - text: 如果调料都放在：
+                    - text: "- ❌ 隔壁房间的储藏室 → 你每次做菜都要跑过去拿，慢死了！"
+                    - text: "- ✅ 灶台旁边的调料架 → 随手就能拿到，快到飞起！"
+                    - text: "---"
+                    - text: "## 💡 Cache 就是\"灶台旁边的调料架\"！"
+                    - text: Cache（缓存） = 把常用的东西放在离你最近的地方，让你用起来特别快！
+                    - text: 用大白话说：
+                    - text: "> Cache就是\"临时小仓库\"，专门存放你经常要用的东西。"
+                    - text: "---"
+                    - text: "## 🏠 生活例子"
+                    - text: "### 例子1：你的书桌 🛋️"
+                    - text: "| 位置 | 放什么 | 速度 |"
+                    - text: "|------|--------|------|"
+                    - text: "| 书桌（Cache） | 今天在读的书 | ⏩ 秒拿 |"
+                    - text: "| 书架（大仓库） | 全部藏书 | ⏱️ 要找一会儿 |"
+                    - text: "### 例子2：大脑记忆 🧠"
+                    - text: "> 你记得爸妈的手机号，不用每次都翻通讯录 —— 这就是大脑里的\"Cache\"！"
+                    - text: "---"
+                    - text: "## 💻 电脑/手机里的Cache"
+                    - text: 我们身边有很多Cache：
+                    - text: "- 📱 CPU Cache：CPU计算时常用的数据，CPU不用跑去内存找，直接从Cache拿"
+                    - text: "- 🌐 浏览器Cache：你之前打开的网页内容，下次打开秒出！"
+                    - text: "- 📱 手机App Cache：你常用的数据缓存起来，不用每次重新下载"
+                    - text: "---"
+                    - text: "## 🤔 思考一下"
+                    - text: "> 如果没有Cache会发生什么？"
+                    - text: ">"
+                    - text: "> - 每次打开网页都要重新下载..."
+                    - text: "> - 每次打开App都要重新加载..."
+                    - text: "> - CPU每算一步都要去内存找数据..."
+                    - text: 是不是想想就头疼？ 😅
+                    - text: "---"
+                    - text: "## ✅ 总结"
+                    - text: Cache的本质：
+                    - text: 用小空间换大速度，把常用的东西放在近处！
+                    - text: "---"
+                    - text: "## 😄 你理解了吗？"
+                    - text: 如果明白了，请告诉我：
+                    - text: "> 你觉得手机里的\"清缓存\"按钮，清掉的是什么？"
+                    - text: 如果还有疑问，尽管问！我接着给你讲！ 🙋‍♂️
+                    - text: "---"
+                    - text: 💡 继续提问，或返回学习页面继续学习
+                  - generic [ref=e463]: 08:45
+            - generic [ref=e439]:
+              - textbox "输入你的问题..." [ref=e440]
+              - button "" [ref=e441] [cursor=pointer]:
+                - generic [ref=e442]: 
+        - text:                     + +      
+  - text:     

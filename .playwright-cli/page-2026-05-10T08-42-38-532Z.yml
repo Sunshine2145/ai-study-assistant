@@ -1,0 +1,31 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - text:               
+    - main [ref=e3]:
+      - generic [ref=e4]:
+        - text: 
+        - generic [ref=e5]: 登录
+        - generic [ref=e6]:
+          - button " 0" [ref=e7] [cursor=pointer]:
+            - generic [ref=e8]: 
+            - generic [ref=e9]: "0"
+          - button "" [ref=e10] [cursor=pointer]:
+            - generic [ref=e11]: 
+      - generic [ref=e12]:                                     + +      
+  - text: 
+  - generic [ref=e15]:
+    - generic [ref=e16]:
+      - generic [ref=e17]: 
+      - heading "AI伴学系统" [level=2] [ref=e18]
+      - paragraph [ref=e19]: 智能备考助手
+    - generic [ref=e20]:
+      - generic [ref=e21]:
+        - generic [ref=e22]: 用户名
+        - textbox "请输入用户名" [ref=e23]
+      - generic [ref=e24]:
+        - generic [ref=e25]: 密码
+        - textbox "请输入密码" [ref=e26]
+      - button "登录" [ref=e27] [cursor=pointer]
+      - link "注册新账号" [ref=e29] [cursor=pointer]:
+        - /url: "#"
+  - text:      
