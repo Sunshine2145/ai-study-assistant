@@ -373,7 +373,7 @@ def _import_questions(questions: list, knowledge_point: Optional[str], source: s
 
             db.execute(
                 """INSERT INTO questions (type, content, options, answer, analysis, knowledge_point, source, source_file, status)
-                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'approved')""",
+                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, 'approved')""",
                 (
                     q.get('type', 'single'),
                     q.get('content', ''),

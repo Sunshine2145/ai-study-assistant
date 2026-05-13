@@ -29,7 +29,7 @@ async def create_upload_progress(file_name: str, file_size: int):
 
     cursor = db.execute(
         """INSERT INTO upload_progress (user_id, file_name, file_size, status, progress, stage)
-           VALUES (?, ?, ?, 'processing', 0, 'file_uploaded')""",
+           VALUES (%s, %s, %s, 'processing', 0, 'file_uploaded')""",
         (user_id, file_name, file_size)
     )
 
@@ -48,7 +48,7 @@ async def get_upload_progress(upload_id: int):
     result = db.fetch_one(
         """SELECT id, file_name, file_size, status, progress, stage,
                   total_questions, processed_questions, error_message
-           FROM upload_progress WHERE id = ?""",
+           FROM upload_progress WHERE id = %s""",
         (upload_id,)
     )
 
@@ -56,15 +56,15 @@ async def get_upload_progress(upload_id: int):
         raise HTTPException(status_code=404, detail="上传任务不存在")
 
     return {
-        "id": result[0],
-        "file_name": result[1],
-        "file_size": result[2],
-        "status": result[3],
-        "progress": result[4],
-        "stage": result[5],
-        "total_questions": result[6],
-        "processed_questions": result[7],
-        "error_message": result[8]
+        "id": result['id'],
+        "file_name": result['file_name'],
+        "file_size": result['file_size'],
+        "status": result['status'],
+        "progress": result['progress'],
+        "stage": result['stage'],
+        "total_questions": result['total_questions'],
+        "processed_questions": result['processed_questions'],
+        "error_message": result['error_message']
     }
 
 
@@ -79,7 +79,7 @@ async def update_upload_progress(
     error_message: Optional[str] = None
 ):
     """更新上传进度"""
-    existing = db.fetch_one("SELECT id FROM upload_progress WHERE id = ?", (upload_id,))
+    existing = db.fetch_one("SELECT id FROM upload_progress WHERE id = %s", (upload_id,))
     if not existing:
         raise HTTPException(status_code=404, detail="上传任务不存在")
 
@@ -87,37 +87,37 @@ async def update_upload_progress(
     params = []
 
     if progress is not None:
-        updates.append("progress = ?")
+        updates.append("progress = %s")
         params.append(progress)
     if stage:
-        updates.append("stage = ?")
+        updates.append("stage = %s")
         params.append(stage)
     if status:
-        updates.append("status = ?")
+        updates.append("status = %s")
         params.append(status)
     if total_questions is not None:
-        updates.append("total_questions = ?")
+        updates.append("total_questions = %s")
         params.append(total_questions)
     if processed_questions is not None:
-        updates.append("processed_questions = ?")
+        updates.append("processed_questions = %s")
         params.append(processed_questions)
     if error_message:
-        updates.append("error_message = ?")
+        updates.append("error_message = %s")
         params.append(error_message)
 
     if updates:
         updates.append("updated_at = CURRENT_TIMESTAMP")
         params.append(upload_id)
-        db.execute(f"UPDATE upload_progress SET {', '.join(updates)} WHERE id = ?", tuple(params))
+        db.execute(f"UPDATE upload_progress SET {', '.join(updates)} WHERE id = %s", tuple(params))
 
     return {"message": "进度更新成功"}
 
 
 @router.get("/progress/{upload_id}/status")
 async def get_upload_status(upload_id: int):
-    """获取简化的���传状态"""
+    """获取简化的上传状态"""
     result = db.fetch_one(
-        "SELECT status, progress, stage FROM upload_progress WHERE id = ?",
+        "SELECT status, progress, stage FROM upload_progress WHERE id = %s",
         (upload_id,)
     )
 
@@ -125,7 +125,7 @@ async def get_upload_status(upload_id: int):
         raise HTTPException(status_code=404, detail="上传任务不存在")
 
     return {
-        "status": result[0],
-        "progress": result[1],
-        "stage": result[2]
+        "status": result['status'],
+        "progress": result['progress'],
+        "stage": result['stage']
     }

@@ -16,14 +16,16 @@ from src.config.settings import settings
 class AIService:
     """Central AI service coordinating all AI operations"""
 
-    def __init__(self, api_key: str = None, model: str = None):
+    def __init__(self, api_key: str = None, model: str = None, base_url: str = None):
         self.api_key = api_key or settings.ai.api_key
         self.model = model or settings.ai.model
-        self.base_url = settings.ai.base_url
-        self.feynman = FeynmanService(self.api_key, self.model)
+        self.base_url = base_url or settings.ai.base_url
+
+        # Pass consistent api_key, model, and base_url to ALL sub-services
+        self.feynman = FeynmanService(self.api_key, self.model, self.base_url)
         self.socratic = SocraticService(self.api_key, self.model)
-        self.pdf_parser = PDFParser(self.api_key, self.model)
-        self.question_generator = QuestionGenerator(self.api_key, self.model)
+        self.pdf_parser = PDFParser(self.api_key, self.model, self.base_url)
+        self.question_generator = QuestionGenerator(self.api_key, self.model, self.base_url)
         self.classifier = DocumentClassifier(self.api_key, self.model)
         self.knowledge_extractor = KnowledgeExtractor(self.api_key, self.model)
         self.question_extractor = QuestionExtractor(self.api_key, self.model)

@@ -37,6 +37,49 @@ QA_PROMPT_TEMPLATE = """你是大王的学习助手，擅长用通俗易懂的�
 """
 
 
+def _get_local_answer(question: str, current_knowledge: Optional[str] = None) -> str:
+    """Generate a local answer using database knowledge when AI is unavailable"""
+    # Try to find relevant knowledge points
+    search_terms = question.strip()
+    kps = db.fetch_all(
+        """SELECT name, chapter FROM knowledge_points
+           WHERE name LIKE %s LIMIT 5""",
+        (f"%{search_terms[:20]}%",)
+    )
+
+    if kps:
+        kp_lines = "\n".join([f"• **{k['name']}**（{k['chapter']}）" for k in kps])
+        return f"""根据知识库查询，关于这个问题，找到以下相关知识点：
+
+{kp_lines}
+
+📚 **学习建议**：
+1. 进入学习地图，选择对应章节开始系统学习
+2. 使用费曼学习法，用自己的话复述概念
+3. 通过苏格拉底提问检验掌握程度
+
+💡 继续提问，或前往学习页面深入学习。"""
+
+    if current_knowledge:
+        return f"""关于 **{current_knowledge}**，这是一个重要的学习内容。
+
+📚 **学习建议**：
+1. 尝试用自己的话描述一下这个概念
+2. 想想它在实际系统架构中有什么应用
+3. 能否举出一个生活中的例子来类比？
+
+💡 建议进入学习地图，使用费曼学习法系统学习这个知识点。"""
+
+    return f"""收到你的问题：「{question}」
+
+📚 **学习建议**：
+1. 进入**学习地图**，浏览完整的知识章节树
+2. 选择一个知识点，使用**费曼学习法**深入学习
+3. 通过**苏格拉底提问**检验学习效果
+
+💡 AI服务暂未配置API密钥，当前使用本地知识库模式。配置 DeepSeek API Key 后可使用完整AI能力。"""
+
+
 @router.post("/chat")
 async def qa_chat(request: QARequest):
     """AI问答 - 发送问题并获取回答"""
@@ -44,90 +87,80 @@ async def qa_chat(request: QARequest):
 
     if request.current_knowledge_id:
         kp = db.fetch_one(
-            "SELECT name FROM knowledge_points WHERE id = ?",
+            "SELECT name FROM knowledge_points WHERE id = %s",
             (request.current_knowledge_id,)
         )
         if kp:
-            current_knowledge = kp[0]
+            current_knowledge = kp['name']
 
-    prompt = QA_PROMPT_TEMPLATE.format(
-        current_knowledge=current_knowledge or "通用学习问题",
-        question=request.question
-    )
+    # Try AI if API key is configured
+    if settings.ai.api_key:
+        prompt = QA_PROMPT_TEMPLATE.format(
+            current_knowledge=current_knowledge or "通用学习问题",
+            question=request.question
+        )
 
-    feynman = FeynmanService(settings.ai.api_key, settings.ai.model)
+        feynman = FeynmanService(settings.ai.api_key, settings.ai.model, settings.ai.base_url)
 
-    try:
-        explanation = await feynman.explain(request.question, prompt)
+        try:
+            explanation = await feynman.explain(request.question, prompt)
 
-        if explanation and not explanation.startswith("抱歉"):
-            response = f"""🎯 **AI问答**
+            if explanation and not explanation.startswith("抱歉"):
+                response = f"""🎯 **AI问答**
 
 {explanation}
 
 ---
 
 💡 继续提问，或返回学习页面继续学习"""
-        else:
-            response = f"""🎯 **AI问答**
+                return {"data": {"response": response, "question": request.question}}
+        except Exception as e:
+            logger.error(f"AI Q&A error: {e}")
 
-抱歉，暂时无法回答这个问题。请稍后重试。
+    # Fallback to local knowledge base
+    local_answer = _get_local_answer(request.question, current_knowledge)
+    response = f"""🎯 **AI问答**（本地知识库模式）
 
-💡 你也可以在学习页面中直接提问。"""
-
-        return {
-            "data": {
-                "response": response,
-                "question": request.question
-            }
-        }
-    except Exception as e:
-        logger.error(f"AI Q&A error: {e}")
-        return {
-            "data": {
-                "response": "AI服务暂时不可用，请稍后重试。",
-                "question": request.question
-            }
-        }
+{local_answer}"""
+    return {"data": {"response": response, "question": request.question}}
 
 
 @router.get("/knowledge-card/{term}")
 async def get_knowledge_card(term: str):
     """获取知识点卡片详情"""
-    # 先从knowledge_points表查询
     kp = db.fetch_one(
         """SELECT id, code, name, chapter FROM knowledge_points
-           WHERE name LIKE ? OR code LIKE ? LIMIT 1""",
+           WHERE name LIKE %s OR code LIKE %s LIMIT 1""",
         (f"%{term}%", f"%{term}%")
     )
 
     if kp:
-        knowledge_id, code, name, chapter = kp
+        knowledge_id = kp['id']
+        code = kp['code']
+        name = kp['name']
+        chapter = kp['chapter']
 
-        # 查询详细内容
         detail = db.fetch_one(
-            "SELECT content, key_concepts FROM knowledge_detail WHERE knowledge_point_id = ?",
+            "SELECT content, key_concepts FROM knowledge_detail WHERE knowledge_point_id = %s",
             (knowledge_id,)
         )
 
-        content = detail[0] if detail else f"这是关于{name}的知识点"
-        key_concepts = detail[1] if detail else ""
+        content = detail['content'] if detail else f"这是关于{name}的知识点"
+        key_concepts = detail['key_concepts'] if detail else ""
 
-        # 查询相关题目
         questions = db.fetch_all(
-            "SELECT content FROM questions WHERE knowledge_point_id = ? LIMIT 3",
-            (knowledge_id,)
+            "SELECT content FROM questions WHERE knowledge_point = %s LIMIT 3",
+            (str(knowledge_id),)
         )
-        related_questions = [q[0] for q in questions] if questions else []
+        related_questions = [q['content'] for q in questions] if questions else []
 
-        # 查询关联知识点
         related_kps = db.fetch_all(
             """SELECT name, status FROM knowledge_points
-               WHERE chapter = ? AND id != ? LIMIT 5""",
+               WHERE chapter = %s AND id != %s LIMIT 5""",
             (chapter, knowledge_id)
         )
         related_knowledge = [
-            {"name": r[0], "status": r[1]}
+            {"name": r['name'], "status": r['status']}
             for r in related_kps
         ] if related_kps else []
 
@@ -144,7 +177,6 @@ async def get_knowledge_card(term: str):
             }
         }
 
-    # 如果没有找到，返回通用卡片
     return {
         "data": {
             "success": True,
@@ -161,6 +193,4 @@ async def get_knowledge_card(term: str):
 
 @router.get("/history")
 async def get_qa_history():
-    """获取AI问答历史"""
-    # 暂时返回空历史，后续可扩展
     return {"data": []}

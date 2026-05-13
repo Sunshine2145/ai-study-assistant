@@ -13,7 +13,7 @@ class KnowledgePointService:
     def list_all(self, stage: Optional[str] = None) -> list:
         if stage:
             results = db.fetch_all(
-                "SELECT id, code, name, chapter, stage, sort_order, status FROM knowledge_points WHERE stage = ? ORDER BY sort_order",
+                "SELECT id, code, name, chapter, stage, sort_order, status FROM knowledge_points WHERE stage = %s ORDER BY sort_order",
                 (stage,)
             )
         else:
@@ -21,36 +21,36 @@ class KnowledgePointService:
                 "SELECT id, code, name, chapter, stage, sort_order, status FROM knowledge_points ORDER BY sort_order"
             )
         return [
-            {"id": r[0], "code": r[1], "name": r[2], "chapter": r[3], "stage": r[4], "sort_order": r[5], "status": r[6]}
+            {"id": r['id'], "code": r['code'], "name": r['name'], "chapter": r['chapter'], "stage": r['stage'], "sort_order": r['sort_order'], "status": r['status']}
             for r in results
         ]
 
     def get_by_id(self, kp_id: int) -> Optional[dict]:
         result = db.fetch_one(
-            "SELECT id, code, name, chapter, stage, sort_order, status FROM knowledge_points WHERE id = ?",
+            "SELECT id, code, name, chapter, stage, sort_order, status FROM knowledge_points WHERE id = %s",
             (kp_id,)
         )
         if not result:
             return None
-        return {"id": result[0], "code": result[1], "name": result[2], "chapter": result[3], "stage": result[4], "sort_order": result[5], "status": result[6]}
+        return {"id": result['id'], "code": result['code'], "name": result['name'], "chapter": result['chapter'], "stage": result['stage'], "sort_order": result['sort_order'], "status": result['status']}
 
     def get_by_code(self, code: str) -> Optional[dict]:
         result = db.fetch_one(
-            "SELECT id, code, name, chapter, stage, sort_order, status FROM knowledge_points WHERE code = ?",
+            "SELECT id, code, name, chapter, stage, sort_order, status FROM knowledge_points WHERE code = %s",
             (code,)
         )
         if not result:
             return None
-        return {"id": result[0], "code": result[1], "name": result[2], "chapter": result[3], "stage": result[4], "sort_order": result[5], "status": result[6]}
+        return {"id": result['id'], "code": result['code'], "name": result['name'], "chapter": result['chapter'], "stage": result['stage'], "sort_order": result['sort_order'], "status": result['status']}
 
     def create(self, data: dict) -> int:
-        existing = db.fetch_one("SELECT id FROM knowledge_points WHERE code = ?", (data["code"],))
+        existing = db.fetch_one("SELECT id FROM knowledge_points WHERE code = %s", (data["code"],))
         if existing:
             raise ValueError(f"知识点编码 {data['code']} 已存在")
 
         cursor = db.execute(
             """INSERT INTO knowledge_points (code, name, chapter, stage, sort_order, status)
-               VALUES (?, ?, ?, ?, ?, ?)""",
+               VALUES (%s, %s, %s, %s, %s, %s)""",
             (data["code"], data["name"], data.get("chapter", ""), data.get("stage", ""),
              data.get("sort_order", 0), data.get("status", "locked"))
         )
@@ -65,7 +65,7 @@ class KnowledgePointService:
         values = []
         for key in ["code", "name", "chapter", "stage", "sort_order", "status"]:
             if key in data:
-                fields.append(f"{key} = ?")
+                fields.append(f"{key} = %s")
                 values.append(data[key])
 
         if not fields:
@@ -73,7 +73,7 @@ class KnowledgePointService:
 
         values.append(kp_id)
         db.execute(
-            f"UPDATE knowledge_points SET {', '.join(fields)} WHERE id = ?",
+            f"UPDATE knowledge_points SET {', '.join(fields)} WHERE id = %s",
             tuple(values)
         )
         return True
@@ -84,13 +84,13 @@ class KnowledgePointService:
             return False
 
         deps = db.fetch_one(
-            "SELECT COUNT(*) FROM questions WHERE knowledge_point = ?",
+            "SELECT COUNT(*) as cnt FROM questions WHERE knowledge_point = %s",
             (str(kp_id),)
         )
-        if deps and deps[0] > 0:
-            raise ValueError(f"该知识点下有 {deps[0]} 道题目，无法删除")
+        if deps and deps['cnt'] > 0:
+            raise ValueError(f"该知识点下有 {deps['cnt']} 道题目，无法删除")
 
-        db.execute("DELETE FROM knowledge_points WHERE id = ?", (kp_id,))
+        db.execute("DELETE FROM knowledge_points WHERE id = %s", (kp_id,))
         return True
 
     def batch_import(self, items: list) -> int:

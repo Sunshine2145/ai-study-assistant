@@ -32,17 +32,21 @@ async def send_message(request: ChatRequest):
 
     if knowledge_id:
         kp = db.fetch_one(
-            "SELECT id, code, name FROM knowledge_points WHERE id = ?",
+            "SELECT id, code, name FROM knowledge_points WHERE id = %s",
             (knowledge_id,)
         )
         if kp:
-            knowledge_id, knowledge_code, knowledge_name = kp
+            knowledge_id = kp['id']
+            knowledge_code = kp['code']
+            knowledge_name = kp['name']
     else:
         current = db.fetch_one(
             "SELECT id, code, name FROM knowledge_points WHERE status = 'unlocked' ORDER BY sort_order LIMIT 1"
         )
         if current:
-            knowledge_id, knowledge_code, knowledge_name = current
+            knowledge_id = current['id']
+            knowledge_code = current['code']
+            knowledge_name = current['name']
 
     if not knowledge_id:
         return {
@@ -56,10 +60,10 @@ async def send_message(request: ChatRequest):
 
     # 查询当前学习阶段
     progress = db.fetch_one(
-        "SELECT learning_phase FROM learning_progress WHERE knowledge_point_id = ?",
+        "SELECT learning_phase FROM learning_progress WHERE knowledge_point_id = %s",
         (knowledge_id,)
     )
-    phase = progress[0] if progress else "feynman"
+    phase = progress['learning_phase'] if progress else "feynman"
 
     # Phase 1: 费曼学习 → 自动返回讲解，然后进入互动阶段
     if phase == "feynman":
@@ -91,22 +95,22 @@ def _update_phase(knowledge_id: int, phase: str):
     """更新学习阶段"""
     db.execute("""
         INSERT INTO learning_progress (user_id, knowledge_point_id, learning_phase, mastery_percentage, socratic_rounds)
-        VALUES (1, ?, ?, 0, 0)
-        ON CONFLICT(user_id, knowledge_point_id) DO UPDATE SET
-        learning_phase = ?,
-        updated_at = CURRENT_TIMESTAMP
+        VALUES (1, %s, %s, 0, 0)
+        ON DUPLICATE KEY UPDATE
+        learning_phase = %s,
+        updated_at = NOW()
     """, (knowledge_id, phase, phase))
 
 
 def _get_socratic_history(knowledge_id: int) -> list:
     """获取苏格拉底问答历史"""
     progress = db.fetch_one(
-        "SELECT socratic_history FROM learning_progress WHERE knowledge_point_id = ?",
+        "SELECT socratic_history FROM learning_progress WHERE knowledge_point_id = %s",
         (knowledge_id,)
     )
-    if progress and progress[0]:
+    if progress and progress['socratic_history']:
         try:
-            return json.loads(progress[0])
+            return json.loads(progress['socratic_history'])
         except (json.JSONDecodeError, TypeError):
             return []
     return []
@@ -116,8 +120,8 @@ def _save_socratic_history(knowledge_id: int, history: list):
     """保存苏格拉底问答历史"""
     db.execute("""
         UPDATE learning_progress
-        SET socratic_history = ?
-        WHERE knowledge_point_id = ?
+        SET socratic_history = %s
+        WHERE knowledge_point_id = %s
     """, (json.dumps(history, ensure_ascii=False), knowledge_id))
 
 
@@ -127,14 +131,14 @@ def _get_today_learned_knowledge(current_knowledge_id: int = None):
         SELECT kp.name, lp.mastery_percentage
         FROM learning_progress lp
         JOIN knowledge_points kp ON lp.knowledge_point_id = kp.id
-        WHERE DATE(lp.updated_at) = DATE('now')
+        WHERE DATE(lp.updated_at) = CURDATE()
         AND lp.learning_phase = 'completed'
-        AND lp.knowledge_point_id != ?
+        AND lp.knowledge_point_id != %s
         ORDER BY lp.updated_at DESC
         LIMIT 5
     """, (current_knowledge_id or 0,))
 
-    return [{"name": r[0], "mastery": r[1]} for r in learned] if learned else []
+    return [{"name": r['name'], "mastery": r['mastery_percentage']} for r in learned] if learned else []
 
 
 async def _generate_feynman_explanation(knowledge_id: int, knowledge_code: str, knowledge_name: str):
@@ -237,7 +241,7 @@ async def _start_socratic_phase(knowledge_id: int, knowledge_code: str, knowledg
     db.execute("""
         UPDATE learning_progress
         SET mastery_percentage = 0, socratic_rounds = 0, socratic_history = '[]'
-        WHERE knowledge_point_id = ?
+        WHERE knowledge_point_id = %s
     """, (knowledge_id,))
 
     # 使用AI生成第一个引导问题
@@ -270,11 +274,11 @@ async def _process_socratic_answer(knowledge_id: int, knowledge_code: str, knowl
     progress = db.fetch_one("""
         SELECT mastery_percentage, socratic_rounds
         FROM learning_progress
-        WHERE knowledge_point_id = ?
+        WHERE knowledge_point_id = %s
     """, (knowledge_id,))
 
-    current_mastery = progress[0] if progress else 0
-    current_rounds = progress[1] if progress else 0
+    current_mastery = progress['mastery_percentage'] if progress else 0
+    current_rounds = progress['socratic_rounds'] if progress else 0
 
     # 获取问答历史
     history = _get_socratic_history(knowledge_id)
@@ -298,11 +302,11 @@ async def _process_socratic_answer(knowledge_id: int, knowledge_code: str, knowl
     if new_mastery >= 90:
         db.execute("""
             UPDATE learning_progress
-            SET mastery_percentage = ?, socratic_rounds = ?, learning_phase = 'completed',
+            SET mastery_percentage = %s, socratic_rounds = %s, learning_phase = 'completed',
                 feynman_completed = 1, feynman_completed_at = CURRENT_TIMESTAMP,
                 last_socratic_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP,
-                socratic_history = ?
-            WHERE knowledge_point_id = ?
+                socratic_history = %s
+            WHERE knowledge_point_id = %s
         """, (new_mastery, new_rounds, json.dumps(history, ensure_ascii=False), knowledge_id))
 
         _complete_and_unlock(knowledge_id)
@@ -345,10 +349,10 @@ async def _process_socratic_answer(knowledge_id: int, knowledge_code: str, knowl
     if new_rounds >= SocraticService.MAX_QUESTIONS:
         db.execute("""
             UPDATE learning_progress
-            SET mastery_percentage = ?, socratic_rounds = ?, learning_phase = 'feynman',
+            SET mastery_percentage = %s, socratic_rounds = %s, learning_phase = 'feynman',
                 last_socratic_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP,
                 socratic_history = '[]'
-            WHERE knowledge_point_id = ?
+            WHERE knowledge_point_id = %s
         """, (new_mastery, new_rounds, knowledge_id))
 
         response = f"""📋 **本轮检验结束**
@@ -377,13 +381,13 @@ async def _process_socratic_answer(knowledge_id: int, knowledge_code: str, knowl
     # 未达标，继续检验
     db.execute("""
         INSERT INTO learning_progress (user_id, knowledge_point_id, mastery_percentage, socratic_rounds, learning_phase, last_socratic_at, socratic_history)
-        VALUES (1, ?, ?, ?, 'socratic', CURRENT_TIMESTAMP, ?)
-        ON CONFLICT(user_id, knowledge_point_id) DO UPDATE SET
-        mastery_percentage = ?,
-        socratic_rounds = ?,
-        last_socratic_at = CURRENT_TIMESTAMP,
-        updated_at = CURRENT_TIMESTAMP,
-        socratic_history = ?
+        VALUES (1, %s, %s, %s, 'socratic', NOW(), %s)
+        ON DUPLICATE KEY UPDATE
+        mastery_percentage = %s,
+        socratic_rounds = %s,
+        last_socratic_at = NOW(),
+        updated_at = NOW(),
+        socratic_history = %s
     """, (knowledge_id, new_mastery, new_rounds, json.dumps(history, ensure_ascii=False),
           new_mastery, new_rounds, json.dumps(history, ensure_ascii=False)))
 
@@ -442,29 +446,29 @@ async def _process_socratic_answer(knowledge_id: int, knowledge_code: str, knowl
 def _complete_and_unlock(knowledge_id: int):
     """标记知识点完成并解锁下一个"""
     current_kp = db.fetch_one(
-        "SELECT code, sort_order FROM knowledge_points WHERE id = ?",
+        "SELECT code, sort_order FROM knowledge_points WHERE id = %s",
         (knowledge_id,)
     )
     if not current_kp:
         return
 
     db.execute(
-        "UPDATE knowledge_points SET status = 'completed' WHERE id = ?",
+        "UPDATE knowledge_points SET status = 'completed' WHERE id = %s",
         (knowledge_id,)
     )
 
     next_kp = db.fetch_one("""
         SELECT id, code, name FROM knowledge_points
-        WHERE sort_order > ? AND status = 'locked'
+        WHERE sort_order > %s AND status = 'locked'
         ORDER BY sort_order LIMIT 1
-    """, (current_kp[1],))
+    """, (current_kp['sort_order'],))
 
     if next_kp:
         db.execute(
-            "UPDATE knowledge_points SET status = 'unlocked' WHERE id = ?",
-            (next_kp[0],)
+            "UPDATE knowledge_points SET status = 'unlocked' WHERE id = %s",
+            (next_kp['id'],)
         )
-        logger.info(f"Unlocked next knowledge point: {next_kp[1]} - {next_kp[2]}")
+        logger.info(f"Unlocked next knowledge point: {next_kp['code']} - {next_kp['name']}")
 
 
 @router.get("/history")
@@ -474,7 +478,7 @@ async def get_chat_history(knowledge_code: Optional[str] = None):
         result = db.fetch_all(
             """SELECT id, session_id, messages, status, created_at
                FROM user_sessions
-               WHERE knowledge_point_id = (SELECT id FROM knowledge_points WHERE code = ?)
+               WHERE knowledge_point_id = (SELECT id FROM knowledge_points WHERE code = %s)
                ORDER BY created_at DESC LIMIT 50""",
             (knowledge_code,)
         )
@@ -482,6 +486,6 @@ async def get_chat_history(knowledge_code: Optional[str] = None):
         result = []
 
     return {"data": [
-        {"session_id": r[1], "messages": r[2], "status": r[3], "time": r[4]}
+        {"session_id": r['session_id'], "messages": r['messages'], "status": r['status'], "time": r['created_at']}
         for r in result
     ]}

@@ -121,33 +121,37 @@ def init_knowledge_points():
     print(f"Initializing {len(knowledge_points)} knowledge points...")
 
     for code, name, chapter, stage in knowledge_points:
-        # Check if exists
         existing = db.fetch_one(
-            "SELECT id FROM knowledge_points WHERE code = ?",
+            "SELECT id FROM knowledge_points WHERE code = %s",
             (code,)
         )
         if not existing:
             db.execute(
                 """INSERT INTO knowledge_points (code, name, chapter, stage, sort_order, status)
-                   VALUES (?, ?, ?, ?, ?, ?)""",
-                (code, name, chapter, stage, len(knowledge_points), "locked")
+                   VALUES (%s, %s, %s, %s, %s, 'locked')""",
+                (code, name, chapter, stage, 1)
             )
             print(f"  Added: {code} - {name}")
 
-    # Unlock first knowledge point - 1.1 计算机系统概述 (starting point)
+    # Unlock first knowledge point
     db.execute(
         "UPDATE knowledge_points SET status = 'unlocked', sort_order = 1 WHERE code = '1.1'"
     )
+
     # Set correct sort order for all points (by code ordering)
     all_kps = db.fetch_all("SELECT id, code FROM knowledge_points ORDER BY code")
-    for i, (kp_id, code) in enumerate(all_kps, 1):
-        db.execute("UPDATE knowledge_points SET sort_order = ? WHERE id = ?", (i, kp_id))
+    for i, kp in enumerate(all_kps, 1):
+        db.execute(
+            "UPDATE knowledge_points SET sort_order = %s WHERE id = %s",
+            (i, kp['id'])
+        )
     print("Unlocked first knowledge point: 1.1 计算机系统概述")
 
     print("Knowledge points initialization complete!")
 
 
 if __name__ == "__main__":
-    from src.database.db import init_database
+    from src.database.db import init_database, create_database_if_not_exists
+    create_database_if_not_exists()
     init_database()
     init_knowledge_points()

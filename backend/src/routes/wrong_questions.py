@@ -12,7 +12,7 @@ router = APIRouter(prefix="/api/wrong-questions", tags=["错题"])
 async def get_wrong_questions(filter: str = "week"):
     """获取错题列表"""
     user = db.fetch_one("SELECT id FROM users LIMIT 1")
-    user_id = user[0] if user else 1
+    user_id = user['id'] if user else 1
 
     if filter == "all":
         results = db.fetch_all(
@@ -21,7 +21,7 @@ async def get_wrong_questions(filter: str = "week"):
                JOIN questions q ON w.question_id = q.id
                LEFT JOIN knowledge_points k ON q.knowledge_point = k.code
                LEFT JOIN answer_records a ON a.question_id = w.question_id AND a.user_id = w.user_id AND a.is_correct = 0
-               WHERE w.user_id = ? AND w.mastered = 0
+               WHERE w.user_id = %s AND w.mastered = 0
                ORDER BY w.last_wrong_at DESC""",
             (user_id,)
         )
@@ -32,8 +32,8 @@ async def get_wrong_questions(filter: str = "week"):
                JOIN questions q ON w.question_id = q.id
                LEFT JOIN knowledge_points k ON q.knowledge_point = k.code
                LEFT JOIN answer_records a ON a.question_id = w.question_id AND a.user_id = w.user_id AND a.is_correct = 0
-               WHERE w.user_id = ? AND w.mastered = 0
-               AND w.last_wrong_at > datetime('now', '-30 days')
+               WHERE w.user_id = %s AND w.mastered = 0
+               AND w.last_wrong_at > DATE_SUB(NOW(), INTERVAL 30 DAY)
                ORDER BY w.last_wrong_at DESC""",
             (user_id,)
         )
@@ -44,8 +44,8 @@ async def get_wrong_questions(filter: str = "week"):
                JOIN questions q ON w.question_id = q.id
                LEFT JOIN knowledge_points k ON q.knowledge_point = k.code
                LEFT JOIN answer_records a ON a.question_id = w.question_id AND a.user_id = w.user_id AND a.is_correct = 0
-               WHERE w.user_id = ? AND w.mastered = 0
-               AND w.last_wrong_at > datetime('now', '-7 days')
+               WHERE w.user_id = %s AND w.mastered = 0
+               AND w.last_wrong_at > DATE_SUB(NOW(), INTERVAL 7 DAY)
                ORDER BY w.last_wrong_at DESC""",
             (user_id,)
         )
@@ -76,14 +76,14 @@ async def get_wrong_questions(filter: str = "week"):
     return {
         "data": [
             {
-                "id": r[0],
-                "question_content": r[1],
-                "correct_answer": r[2],
-                "analysis": r[3],
-                "wrong_count": r[4],
-                "wrong_date": r[5].split()[0] if r[5] else "",
-                "knowledge_name": r[6],
-                "user_answer": r[7] or "未知"
+                "id": r['id'],
+                "question_content": r['content'],
+                "correct_answer": r['answer'],
+                "analysis": r['analysis'],
+                "wrong_count": r['wrong_count'],
+                "wrong_date": str(r['last_wrong_at']).split()[0] if r['last_wrong_at'] else "",
+                "knowledge_name": r['name'],
+                "user_answer": r['user_answer'] or "未知"
             }
             for r in results
         ]
@@ -94,7 +94,7 @@ async def get_wrong_questions(filter: str = "week"):
 async def mark_as_mastered(id: int):
     """标记已掌握"""
     db.execute(
-        "UPDATE wrong_questions SET mastered = 1, mastered_at = CURRENT_TIMESTAMP WHERE id = ?",
+        "UPDATE wrong_questions SET mastered = 1, mastered_at = CURRENT_TIMESTAMP WHERE id = %s",
         (id,)
     )
     return {"message": "已标记为掌握"}
@@ -103,5 +103,5 @@ async def mark_as_mastered(id: int):
 @router.delete("/{id}")
 async def delete_wrong_question(id: int):
     """删除错题记录"""
-    db.execute("DELETE FROM wrong_questions WHERE id = ?", (id,))
+    db.execute("DELETE FROM wrong_questions WHERE id = %s", (id,))
     return {"message": "已删除"}

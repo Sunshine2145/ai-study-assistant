@@ -26,17 +26,17 @@ async def get_current_user():
     if not result:
         # 创建默认用户
         db.execute(
-            "INSERT INTO users (nickname, feishu_openid) VALUES (?, ?)",
+            "INSERT INTO users (nickname, feishu_openid) VALUES (%s, %s)",
             ("谭晓磊", "default_user")
         )
         return {"id": 1, "nickname": "谭晓磊", "level": 1, "score": 0, "streak": 0}
 
     return {
-        "id": result[0],
-        "nickname": result[1] or "学员",
-        "level": result[2] or 1,
-        "score": result[3] or 0,
-        "streak": result[4] or 0
+        "id": result['id'],
+        "nickname": result['nickname'] or "学员",
+        "level": result['level'] or 1,
+        "score": result['score'] or 0,
+        "streak": result['streak'] or 0
     }
 
 
@@ -44,18 +44,18 @@ async def get_current_user():
 async def get_user(user_id: int):
     """获取指定用户信息"""
     result = db.fetch_one(
-        "SELECT id, nickname, level, score, streak FROM users WHERE id = ?",
+        "SELECT id, nickname, level, score, streak FROM users WHERE id = %s",
         (user_id,)
     )
     if not result:
         raise HTTPException(status_code=404, detail="用户不存在")
 
     return {
-        "id": result[0],
-        "nickname": result[1] or "学员",
-        "level": result[2] or 1,
-        "score": result[3] or 0,
-        "streak": result[4] or 0
+        "id": result['id'],
+        "nickname": result['nickname'] or "学员",
+        "level": result['level'] or 1,
+        "score": result['score'] or 0,
+        "streak": result['streak'] or 0
     }
 
 
@@ -63,5 +63,5 @@ async def get_user(user_id: int):
 async def update_user(user_id: int, nickname: Optional[str] = None):
     """更新用户信息"""
     if nickname:
-        db.execute("UPDATE users SET nickname = ? WHERE id = ?", (nickname, user_id))
+        db.execute("UPDATE users SET nickname = %s WHERE id = %s", (nickname, user_id))
     return {"message": "更新成功"}

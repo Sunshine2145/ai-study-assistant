@@ -29,10 +29,11 @@ class FeynmanService:
 - 段落清晰，逻辑递进
 """
 
-    def __init__(self, api_key: str, model: str = "MiniMax-M2.7"):
+    def __init__(self, api_key: str, model: str = "deepseek-v4-flash",
+                 base_url: str = "https://api.deepseek.com"):
         self.api_key = api_key
         self.model = model
-        self.base_url = "https://api.minimaxi.com/v1"
+        self.base_url = base_url
 
     async def explain(self, title: str, content: str) -> str:
         """Generate Feynman-style explanation for a knowledge point"""

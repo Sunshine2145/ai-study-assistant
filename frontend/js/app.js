@@ -27,11 +27,16 @@ const state = {
 const api = {
     async request(endpoint, options = {}) {
         try {
+            const token = localStorage.getItem('token');
+            const headers = {
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
             const response = await fetch(`${API_BASE}${endpoint}`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...options.headers
-                },
+                headers,
                 ...options
             });
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -73,12 +78,16 @@ const api = {
     async getReminders() { return await this.request('/reminders'); },
     async uploadQuestions(formData, useAiParse = true, aiProvider = 'deepseek') {
         try {
+            const token = localStorage.getItem('token');
             const params = useAiParse
                 ? `?use_ai_parse=true&ai_provider=${aiProvider}`
                 : `?use_ai_parse=false`;
             const url = `${API_BASE}/upload/questions${params}`;
+            const headers = {};
+            if (token) headers['Authorization'] = `Bearer ${token}`;
             const response = await fetch(url, {
                 method: 'POST',
+                headers,
                 body: formData
             });
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -913,11 +922,11 @@ function initUpload() {
 async function handleFileUpload(file) {
     if (!file) return;
 
-    const allowedTypes = ['.txt', '.json', '.md', '.pdf'];
+    const allowedTypes = ['.txt', '.json', '.md', '.pdf', '.docx', '.xlsx', '.xls'];
     const ext = '.' + file.name.split('.').pop().toLowerCase();
 
     if (!allowedTypes.includes(ext)) {
-        showToast('不支持的文件格式，请上传 .txt、.json、.md 或 .pdf 文件', 'error');
+        showToast('不支持的文件格式，请上传 .txt、.json、.md、.pdf、.docx 或 .xlsx 文件', 'error');
         return;
     }
 
@@ -1495,6 +1504,7 @@ async function doLogin() {
     console.log('Login result:', result);
     if (result && result.user_id) {
         localStorage.setItem('user', JSON.stringify(result));
+        if (result.token) localStorage.setItem('token', result.token);
         loadUserInfo();
         navigateTo('map');
     } else {
@@ -1629,6 +1639,7 @@ async function doLoginNew(event) {
         console.log('Login result:', result);
         if (result && result.user_id) {
             localStorage.setItem('user', JSON.stringify(result));
+            if (result.token) localStorage.setItem('token', result.token);
             loadUserInfo();
             navigateTo('map');
         } else {

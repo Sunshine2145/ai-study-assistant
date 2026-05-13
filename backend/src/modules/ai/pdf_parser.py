@@ -32,10 +32,10 @@ Rules:
 - If cannot extract, return empty array []
 """
 
-    def __init__(self, api_key: str, model: str = "MiniMax-M2.7", base_url: str = None):
+    def __init__(self, api_key: str, model: str = "deepseek-v4-flash", base_url: str = None):
         self.api_key = api_key
         self.model = model
-        self.base_url = base_url or "https://api.minimaxi.com/v1"
+        self.base_url = base_url or "https://api.deepseek.com"
 
     async def parse(self, text: str) -> list:
         """Parse questions from PDF text"""

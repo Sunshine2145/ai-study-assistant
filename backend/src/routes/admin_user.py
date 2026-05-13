@@ -44,25 +44,23 @@ async def get_user_list():
 
     result = []
     for u in users:
-        user_id, username, nickname, email, role, status, score, streak = u
-
         # Get permissions
         perms = db.fetch_all(
-            "SELECT module FROM user_permissions WHERE user_id = ?",
-            (user_id,)
+            "SELECT module FROM user_permissions WHERE user_id = %s",
+            (u['id'],)
         )
-        permissions = [p[0] for p in perms] if perms else []
+        permissions = [p['module'] for p in perms] if perms else []
 
         result.append({
-            "id": user_id,
-            "username": username,
-            "nickname": nickname or username,
-            "email": email or "",
-            "role": role or "user",
-            "status": status or "active",
+            "id": u['id'],
+            "username": u['username'],
+            "nickname": u['nickname'] or u['username'],
+            "email": u['email'] or "",
+            "role": u['role'] or "user",
+            "status": u['status'] or "active",
             "permissions": permissions,
-            "score": score or 0,
-            "streak": streak or 0
+            "score": u['score'] or 0,
+            "streak": u['streak'] or 0
         })
 
     return {"data": result}
@@ -73,7 +71,7 @@ async def get_user(user_id: int):
     """获取指定用户信息"""
     user = db.fetch_one(
         """SELECT id, username, nickname, email, role, status, score, streak
-           FROM users WHERE id = ?""",
+           FROM users WHERE id = %s""",
         (user_id,)
     )
 
@@ -82,21 +80,21 @@ async def get_user(user_id: int):
 
     # Get permissions
     perms = db.fetch_all(
-        "SELECT module FROM user_permissions WHERE user_id = ?",
+        "SELECT module FROM user_permissions WHERE user_id = %s",
         (user_id,)
     )
-    permissions = [p[0] for p in perms] if perms else []
+    permissions = [p['module'] for p in perms] if perms else []
 
     return {
-        "id": user[0],
-        "username": user[1],
-        "nickname": user[2] or user[1],
-        "email": user[3] or "",
-        "role": user[4] or "user",
-        "status": user[5] or "active",
+        "id": user['id'],
+        "username": user['username'],
+        "nickname": user['nickname'] or user['username'],
+        "email": user['email'] or "",
+        "role": user['role'] or "user",
+        "status": user['status'] or "active",
         "permissions": permissions,
-        "score": user[6] or 0,
-        "streak": user[7] or 0
+        "score": user['score'] or 0,
+        "streak": user['streak'] or 0
     }
 
 
@@ -104,7 +102,7 @@ async def get_user(user_id: int):
 async def update_user(user_id: int, request: UpdateUserRequest):
     """更新用户信息"""
     # Check if user exists
-    existing = db.fetch_one("SELECT id FROM users WHERE id = ?", (user_id,))
+    existing = db.fetch_one("SELECT id FROM users WHERE id = %s", (user_id,))
     if not existing:
         raise HTTPException(status_code=404, detail="用户不存在")
 
@@ -113,23 +111,23 @@ async def update_user(user_id: int, request: UpdateUserRequest):
     params = []
 
     if request.nickname:
-        updates.append("nickname = ?")
+        updates.append("nickname = %s")
         params.append(request.nickname)
     if request.email:
-        updates.append("email = ?")
+        updates.append("email = %s")
         params.append(request.email)
     if request.role:
-        updates.append("role = ?")
+        updates.append("role = %s")
         params.append(request.role)
     if request.status:
-        updates.append("status = ?")
+        updates.append("status = %s")
         params.append(request.status)
 
     if not updates:
         return {"message": "没有需要更新的内容"}
 
     params.append(user_id)
-    db.execute(f"UPDATE users SET {', '.join(updates)} WHERE id = ?", tuple(params))
+    db.execute(f"UPDATE users SET {', '.join(updates)} WHERE id = %s", tuple(params))
 
     return {"message": "用户信息更新成功"}
 
@@ -138,23 +136,23 @@ async def update_user(user_id: int, request: UpdateUserRequest):
 async def update_user_permissions(user_id: int, request: UpdatePermissionsRequest):
     """更新用户权限"""
     # Check if user exists
-    existing = db.fetch_one("SELECT id FROM users WHERE id = ?", (user_id,))
+    existing = db.fetch_one("SELECT id FROM users WHERE id = %s", (user_id,))
     if not existing:
         raise HTTPException(status_code=404, detail="用户不存在")
 
     # Delete existing permissions
-    db.execute("DELETE FROM user_permissions WHERE user_id = ?", (user_id,))
+    db.execute("DELETE FROM user_permissions WHERE user_id = %s", (user_id,))
 
     # Insert new permissions
     for module in request.permissions:
         db.execute(
-            "INSERT INTO user_permissions (user_id, module) VALUES (?, ?)",
+            "INSERT INTO user_permissions (user_id, module) VALUES (%s, %s)",
             (user_id, module)
         )
 
     # Also update the JSON field
     db.execute(
-        "UPDATE users SET permissions = ? WHERE id = ?",
+        "UPDATE users SET permissions = %s WHERE id = %s",
         (json.dumps(request.permissions), user_id)
     )
 
@@ -164,20 +162,20 @@ async def update_user_permissions(user_id: int, request: UpdatePermissionsReques
 @router.post("/{user_id}/ban")
 async def ban_user(user_id: int):
     """禁用用户"""
-    existing = db.fetch_one("SELECT id FROM users WHERE id = ?", (user_id,))
+    existing = db.fetch_one("SELECT id FROM users WHERE id = %s", (user_id,))
     if not existing:
         raise HTTPException(status_code=404, detail="用户不存在")
 
-    db.execute("UPDATE users SET status = 'banned' WHERE id = ?", (user_id,))
+    db.execute("UPDATE users SET status = 'banned' WHERE id = %s", (user_id,))
     return {"message": "用户已禁用"}
 
 
 @router.post("/{user_id}/unban")
 async def unban_user(user_id: int):
     """启用用户"""
-    existing = db.fetch_one("SELECT id FROM users WHERE id = ?", (user_id,))
+    existing = db.fetch_one("SELECT id FROM users WHERE id = %s", (user_id,))
     if not existing:
         raise HTTPException(status_code=404, detail="用户不存在")
 
-    db.execute("UPDATE users SET status = 'active' WHERE id = ?", (user_id,))
+    db.execute("UPDATE users SET status = 'active' WHERE id = %s", (user_id,))
     return {"message": "用户已启用"}

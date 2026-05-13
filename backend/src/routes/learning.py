@@ -17,19 +17,17 @@ async def get_learning_status():
     if not user:
         return _default_status()
 
-    user_id, score, streak = user
-
     # 获取知识点统计
-    total = db.fetch_one("SELECT COUNT(*) FROM knowledge_points")[0]
+    total = db.fetch_one("SELECT COUNT(*) as cnt FROM knowledge_points")['cnt']
     completed = db.fetch_one(
-        "SELECT COUNT(*) FROM knowledge_points WHERE status = 'completed'"
-    )[0]
+        "SELECT COUNT(*) as cnt FROM knowledge_points WHERE status = 'completed'"
+    )['cnt']
 
     # 获取错题数
     wrong_count = db.fetch_one(
-        "SELECT COUNT(*) FROM wrong_questions WHERE user_id = ? AND mastered = 0",
-        (user_id,)
-    )[0]
+        "SELECT COUNT(*) as cnt FROM wrong_questions WHERE user_id = %s AND mastered = 0",
+        (user['id'],)
+    )['cnt']
 
     # 获取当前学习知识点
     current = db.fetch_one(
@@ -38,13 +36,13 @@ async def get_learning_status():
 
     return {
         "user_name": "谭晓磊",
-        "streak": streak or 0,
-        "total_points": score or 0,
-        "learn_days": streak or 1,
+        "streak": user['streak'] or 0,
+        "total_points": user['score'] or 0,
+        "learn_days": user['streak'] or 1,
         "completed_count": completed or 0,
         "total_count": total or 0,
         "wrong_count": wrong_count or 0,
-        "current_knowledge": current[1] if current else "1.2.4 存储器",
+        "current_knowledge": current['name'] if current else "1.2.4 存储器",
         "estimated_time": "预计学习时长：15分钟",
         "next_learning_tip": "继续学习下一个知识点"
     }
@@ -66,22 +64,22 @@ async def get_current_knowledge():
         )
         if first_kp:
             return {
-                "id": first_kp[0],
-                "code": first_kp[1],
-                "name": first_kp[2],
-                "chapter": first_kp[3],
-                "stage": first_kp[4],
+                "id": first_kp['id'],
+                "code": first_kp['code'],
+                "name": first_kp['name'],
+                "chapter": first_kp['chapter'],
+                "stage": first_kp['stage'],
                 "feynman_content": None,
                 "socratic_hint": "请选择一个知识点开始学习"
             }
         return {"id": 1, "code": "1.1", "name": "计算机系统概述", "chapter": "计算机基础", "stage": "第一阶段"}
 
     return {
-        "id": result[0],
-        "code": result[1],
-        "name": result[2],
-        "chapter": result[3],
-        "stage": result[4],
+        "id": result['id'],
+        "code": result['code'],
+        "name": result['name'],
+        "chapter": result['chapter'],
+        "stage": result['stage'],
         "feynman_content": None,
         "socratic_hint": "请用一句话解释这个概念"
     }
@@ -93,26 +91,24 @@ async def generate_feynman_content(knowledge_id: int):
     from src.modules.ai.service import AIService
 
     kp = db.fetch_one(
-        "SELECT id, code, name FROM knowledge_points WHERE id = ?",
+        "SELECT id, code, name FROM knowledge_points WHERE id = %s",
         (knowledge_id,)
     )
 
     if not kp:
         return {"success": False, "message": "知识点不存在"}
 
-    kp_id, kp_code, kp_name = kp
-
     try:
         ai_service = AIService()
-        feynman_content = await ai_service.generate_feynman_explanation(kp_code, kp_name)
+        feynman_content = await ai_service.generate_feynman_explanation(kp['code'], kp['name'])
 
         if feynman_content:
             return {
                 "success": True,
                 "data": {
                     "content": feynman_content,
-                    "knowledge_id": kp_id,
-                    "knowledge_name": kp_name
+                    "knowledge_id": kp['id'],
+                    "knowledge_name": kp['name']
                 }
             }
         else:
@@ -166,16 +162,16 @@ async def get_learning_progress(knowledge_id: int):
     result = db.fetch_one(
         """SELECT feynman_completed, practice_completed, test_completed
            FROM learning_progress
-           WHERE knowledge_point_id = ?""",
+           WHERE knowledge_point_id = %s""",
         (knowledge_id,)
     )
     if not result:
         return {"data": {"feynman": False, "practice": False, "test": False}}
     return {
         "data": {
-            "feynman": bool(result[0]),
-            "practice": bool(result[1]),
-            "test": bool(result[2])
+            "feynman": bool(result['feynman_completed']),
+            "practice": bool(result['practice_completed']),
+            "test": bool(result['test_completed'])
         }
     }
 
@@ -189,15 +185,15 @@ async def complete_learning_step(knowledge_id: int, step: str):
 
     db.execute("""
         INSERT INTO learning_progress (user_id, knowledge_point_id, feynman_completed, practice_completed, test_completed)
-        VALUES (1, ?, ?, ?, ?)
-        ON CONFLICT(user_id, knowledge_point_id) DO UPDATE SET
-        feynman_completed = CASE WHEN ? THEN 1 ELSE feynman_completed END,
-        feynman_completed_at = CASE WHEN ? THEN CURRENT_TIMESTAMP ELSE feynman_completed_at END,
-        practice_completed = CASE WHEN ? THEN 1 ELSE practice_completed END,
-        practice_completed_at = CASE WHEN ? THEN CURRENT_TIMESTAMP ELSE practice_completed_at END,
-        test_completed = CASE WHEN ? THEN 1 ELSE test_completed END,
-        test_completed_at = CASE WHEN ? THEN CURRENT_TIMESTAMP ELSE test_completed_at END,
-        updated_at = CURRENT_TIMESTAMP
+        VALUES (1, %s, %s, %s, %s)
+        ON DUPLICATE KEY UPDATE
+        feynman_completed = CASE WHEN %s THEN 1 ELSE feynman_completed END,
+        feynman_completed_at = CASE WHEN %s THEN NOW() ELSE feynman_completed_at END,
+        practice_completed = CASE WHEN %s THEN 1 ELSE practice_completed END,
+        practice_completed_at = CASE WHEN %s THEN NOW() ELSE practice_completed_at END,
+        test_completed = CASE WHEN %s THEN 1 ELSE test_completed END,
+        test_completed_at = CASE WHEN %s THEN NOW() ELSE test_completed_at END,
+        updated_at = NOW()
     """, (knowledge_id,
           1 if step == "feynman" else 0, 1 if step == "practice" else 0, 1 if step == "test" else 0,
           step == "feynman", step == "feynman",
@@ -211,10 +207,10 @@ async def complete_learning_step(knowledge_id: int, step: str):
 async def can_practice(knowledge_id: int):
     """检查是否可以开始练习"""
     result = db.fetch_one(
-        "SELECT feynman_completed FROM learning_progress WHERE knowledge_point_id = ?",
+        "SELECT feynman_completed FROM learning_progress WHERE knowledge_point_id = %s",
         (knowledge_id,)
     )
-    can_start = result and result[0] == 1
+    can_start = result and result['feynman_completed'] == 1
     return {
         "data": {
             "can_practice": can_start,
@@ -227,28 +223,28 @@ async def can_practice(knowledge_id: int):
 async def select_learning_unit(knowledge_id: int):
     """选择学习单元"""
     kp = db.fetch_one(
-        "SELECT id, code, name, status FROM knowledge_points WHERE id = ?",
+        "SELECT id, code, name, status FROM knowledge_points WHERE id = %s",
         (knowledge_id,)
     )
     if not kp:
         return {"success": False, "message": "知识点不存在"}
 
-    if kp[3] == 'locked':
+    if kp['status'] == 'locked':
         return {"success": False, "message": "请先完成前置知识点的学习"}
 
     db.execute(
-        "UPDATE knowledge_points SET status = 'unlocked' WHERE id = ?",
+        "UPDATE knowledge_points SET status = 'unlocked' WHERE id = %s",
         (knowledge_id,)
     )
 
     db.execute("""
         INSERT INTO learning_progress (user_id, knowledge_point_id, mastery_percentage, socratic_rounds, learning_phase)
-        VALUES (1, ?, 0, 0, 'feynman')
-        ON CONFLICT(user_id, knowledge_point_id) DO UPDATE SET
+        VALUES (1, %s, 0, 0, 'feynman')
+        ON DUPLICATE KEY UPDATE
         learning_phase = 'feynman',
         mastery_percentage = 0,
         socratic_rounds = 0,
-        updated_at = CURRENT_TIMESTAMP
+        updated_at = NOW()
     """, (knowledge_id,))
 
     return {"success": True, "message": "已选择该知识点开始学习"}
@@ -260,7 +256,7 @@ async def get_mastery_status(knowledge_id: int):
     result = db.fetch_one("""
         SELECT mastery_percentage, socratic_rounds, feynman_completed, practice_completed, learning_phase
         FROM learning_progress
-        WHERE knowledge_point_id = ?
+        WHERE knowledge_point_id = %s
     """, (knowledge_id,))
 
     if not result:
@@ -274,13 +270,13 @@ async def get_mastery_status(knowledge_id: int):
         }
 
     return {
-        "mastery_percentage": result[0],
-        "socratic_rounds": result[1],
-        "feynman_completed": bool(result[2]),
-        "practice_completed": bool(result[3]),
-        "learning_phase": result[4] or "feynman",
-        "threshold_met": result[0] >= 90,
-        "message": "已达标，可以进入练习" if result[0] >= 90 else f"还需{90 - result[0]}%掌握度"
+        "mastery_percentage": result['mastery_percentage'],
+        "socratic_rounds": result['socratic_rounds'],
+        "feynman_completed": bool(result['feynman_completed']),
+        "practice_completed": bool(result['practice_completed']),
+        "learning_phase": result['learning_phase'] or "feynman",
+        "threshold_met": result['mastery_percentage'] >= 90,
+        "message": "已达标，可以进入练习" if result['mastery_percentage'] >= 90 else f"还需{90 - result['mastery_percentage']}%掌握度"
     }
 
 
@@ -290,14 +286,14 @@ async def unlock_next_unit(knowledge_id: int):
     result = db.fetch_one("""
         SELECT mastery_percentage, socratic_rounds
         FROM learning_progress
-        WHERE knowledge_point_id = ?
+        WHERE knowledge_point_id = %s
     """, (knowledge_id,))
 
     if not result:
         return {"success": False, "message": "未找到学习进度"}
 
-    mastery = result[0]
-    rounds = result[1]
+    mastery = result['mastery_percentage']
+    rounds = result['socratic_rounds']
 
     if mastery < 90:
         return {
@@ -310,37 +306,37 @@ async def unlock_next_unit(knowledge_id: int):
     db.execute("""
         UPDATE learning_progress
         SET feynman_completed = 1, feynman_completed_at = CURRENT_TIMESTAMP, learning_phase = 'completed'
-        WHERE knowledge_point_id = ?
+        WHERE knowledge_point_id = %s
     """, (knowledge_id,))
 
     # 标记当前知识点为已完成
     db.execute(
-        "UPDATE knowledge_points SET status = 'completed' WHERE id = ?",
+        "UPDATE knowledge_points SET status = 'completed' WHERE id = %s",
         (knowledge_id,)
     )
 
     current_kp = db.fetch_one(
-        "SELECT code, sort_order FROM knowledge_points WHERE id = ?",
+        "SELECT code, sort_order FROM knowledge_points WHERE id = %s",
         (knowledge_id,)
     )
 
     if current_kp:
         next_kp = db.fetch_one("""
             SELECT id, code, name FROM knowledge_points
-            WHERE sort_order > ? AND status = 'locked'
+            WHERE sort_order > %s AND status = 'locked'
             ORDER BY sort_order LIMIT 1
-        """, (current_kp[1],))
+        """, (current_kp['sort_order'],))
 
         if next_kp:
             db.execute(
-                "UPDATE knowledge_points SET status = 'unlocked' WHERE id = ?",
-                (next_kp[0],)
+                "UPDATE knowledge_points SET status = 'unlocked' WHERE id = %s",
+                (next_kp['id'],)
             )
             return {
                 "success": True,
                 "message": "太棒了！已掌握该知识点，下一单元已解锁",
-                "next_knowledge_id": next_kp[0],
-                "next_knowledge_name": next_kp[2]
+                "next_knowledge_id": next_kp['id'],
+                "next_knowledge_name": next_kp['name']
             }
 
     return {"success": True, "message": "太棒了！已掌握该知识点（暂无下一单元）"}

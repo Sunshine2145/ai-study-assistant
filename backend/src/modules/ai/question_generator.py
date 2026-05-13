@@ -29,10 +29,10 @@ class QuestionGenerator:
 ]
 """
 
-    def __init__(self, api_key: str, model: str = "MiniMax-M2.7"):
+    def __init__(self, api_key: str, model: str = "deepseek-v4-flash", base_url: str = None):
         self.api_key = api_key
         self.model = model
-        self.base_url = "https://api.minimaxi.com/v1"
+        self.base_url = base_url or "https://api.deepseek.com"
 
     async def generate(self, knowledge: str, count: int = 5) -> list:
         """Generate practice questions"""

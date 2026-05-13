@@ -5,13 +5,16 @@ from loguru import logger
 
 from src.config.settings import settings
 from src.modules.feishu.bot import FeishuBot
-from src.database.db import init_database
+from src.database.db import init_database, create_database_if_not_exists
 
 
 def main():
     logger.info("Starting AI伴学系统...")
 
-    # Initialize database
+    # Create database if not exists
+    create_database_if_not_exists()
+
+    # Initialize database tables
     init_database()
 
     # Initialize Feishu bot
