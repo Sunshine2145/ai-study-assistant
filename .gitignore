@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.venv/
+venv/
+env/
+ENV/
+
+# 数据库文件（含敏感数据，不提交）
+*.db
+*.sqlite
+*.sqlite3
+backend/database/*.db
+
+# 环境变量（含密钥，绝不提交）
+.env
+.env.*
+!.env.example
+
+# IDE / 编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# WorkBuddy 内部文件
+.workbuddy/
+.uploads/
+
+# 日志
+*.log
+logs/
+
+# Node.js（如将来引入前端构建工具）
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+
+# 临时文件
+*.tmp
+*.temp
