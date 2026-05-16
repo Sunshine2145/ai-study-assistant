@@ -671,17 +671,11 @@ async function startLearn(code) {
 async function reviewWrong(id) { navigateTo('practice'); }
 
 async function selectKnowledgePoint(knowledgeId, knowledgeName) {
-    // 先跳转到学习模块，显示加载提示
-    navigateTo('learn');
-    const chatMessages = document.getElementById('chatMessages');
-    chatMessages.innerHTML = `<div class="message ai-message"><div class="message-avatar"><i class="fas fa-robot"></i></div><div class="message-content"><div class="message-sender">AI伴学助手</div><div class="message-text"><p>正在加载${knowledgeName}学习内容，请稍后...</p></div><div class="message-time">${getCurrentTime()}</div></div></div>`;
-
+    // 先跳转到学习模块，避免重复加载学习内容
     const result = await api.selectLearningUnit(knowledgeId);
     if (result && result.success) {
-        state.currentKnowledge = { id: knowledgeId, name: knowledgeName };
-        await loadLearnDataWithFeynman(knowledgeId);
+        navigateTo('learn');
     } else {
-        chatMessages.innerHTML = '';
         showToast(result.message || '选择失败，请检查是否已解锁', 'error');
     }
 }
@@ -1694,6 +1688,26 @@ function showLogin() {
     navigateTo('login');
 }
 
+// 用户主动退出登录
+async function doLogout() {
+    if (!confirm('确认退出登录？')) return;
+    try {
+        await api.logout();
+    } catch (e) {
+        console.warn('logout api error', e);
+    }
+    // 清理本地状态
+    try { localStorage.removeItem('user'); } catch (e) {}
+    state.user = null;
+    // 更新 UI 显示
+    document.getElementById('userName') && (document.getElementById('userName').textContent = '请登录');
+    document.getElementById('streakDays') && (document.getElementById('streakDays').textContent = '0');
+    document.getElementById('totalPoints') && (document.getElementById('totalPoints').textContent = '0');
+    applyNavPermissionCheck();
+    showToast('已退出登录', 'success');
+    navigateTo('login');
+}
+
 // 用户管理页面加载
 async function loadUserManagementData() {
     const userListEl = document.getElementById('userList');
@@ -1899,16 +1913,37 @@ async function toggleUserStatus(userId, action) {
 
 // ── 添加用户 ──────────────────────────────────
 
-async function showAddUserDialog() {
-    const username = prompt('请输入新用户的用户名：');
-    if (!username) return;
-    const password = prompt('请输入新用户的密码：');
-    if (!password) return;
-    const nickname = prompt('请输入昵称（可选）：') || username;
-    const email = prompt('请输入邮箱（可选）：') || '';
+function showAddUserDialog() {
+    const modal = document.getElementById('addUserModal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    document.getElementById('addUsername').value = '';
+    document.getElementById('addPassword').value = '';
+    document.getElementById('addNickname').value = '';
+    document.getElementById('addEmail').value = '';
+}
+
+function closeAddUserDialog() {
+    const modal = document.getElementById('addUserModal');
+    if (!modal) return;
+    modal.style.display = 'none';
+}
+
+async function createUserFromForm() {
+    const username = document.getElementById('addUsername').value.trim();
+    const password = document.getElementById('addPassword').value;
+    const nickname = document.getElementById('addNickname').value.trim() || username;
+    const email = document.getElementById('addEmail').value.trim();
+
+    if (!username || !password) {
+        showToast('用户名和密码为必填项', 'warning');
+        return;
+    }
+
     const result = await api.createUser({ username, password, nickname, email });
     if (result && result.message) {
         showToast(result.message, 'success');
+        closeAddUserDialog();
         loadUserManagementData();
     } else {
         showToast(result?.detail || '添加用户失败', 'error');

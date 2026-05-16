@@ -79,6 +79,9 @@
                             <span class="points"><i class="fas fa-star"></i> <span id="totalPoints">0</span>分</span>
                         </div>
                     </div>
+                    <button class="icon-btn" id="logoutBtn" title="退出登录" onclick="doLogout()" style="margin-left:8px;">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
                 </div>
             </div>
         </aside>
@@ -664,23 +667,23 @@
                     </div>
                 </div>
 
+                <!-- 用户管理页面（仅管理员可见） -->
+                <div class="page" id="page-user-management" style="display: none;">
+                    <div class="user-management-container">
+                        <div class="page-header">
+                            <h2><i class="fas fa-users"></i> 用户管理</h2>
+                        </div>
+                        <div class="user-list" id="userList">
+                            <p class="empty-hint">加载中...</p>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </main>
     </div>
 
-    <!-- 用户管理页面（仅管理员可见） -->
-            <div class="page" id="page-user-management" style="display: none;">
-                <div class="user-management-container">
-                    <div class="page-header">
-                        <h2><i class="fas fa-users"></i> 用户管理</h2>
-                    </div>
-                    <div class="user-list" id="userList">
-                        <p class="empty-hint">加载中...</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 登录页面 -->
+    <!-- 登录页面 -->
             <div class="page" id="page-login" style="display: none;">
                 <div class="page-login-bg"></div>
                 <div class="login-page-container">
@@ -865,6 +868,40 @@
             <div class="auth-modal-footer">
                 <button class="btn btn-outline" onclick="closeEditUserModal()">取消</button>
                 <button class="btn btn-primary" onclick="saveEditUser()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加用户模态框 -->
+    <div class="auth-modal" id="addUserModal" style="display: none;">
+        <div class="auth-modal-card">
+            <div class="auth-modal-header">
+                <h3><i class="fas fa-user-plus"></i> 添加用户</h3>
+                <button class="close-btn" onclick="closeAddUserDialog()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="auth-modal-body">
+                <div class="edit-modal-field">
+                    <label>用户名</label>
+                    <input type="text" id="addUsername" placeholder="请输入用户名">
+                </div>
+                <div class="edit-modal-field">
+                    <label>密码</label>
+                    <input type="password" id="addPassword" placeholder="请输入密码">
+                </div>
+                <div class="edit-modal-field">
+                    <label>昵称</label>
+                    <input type="text" id="addNickname" placeholder="请输入昵称（可选）">
+                </div>
+                <div class="edit-modal-field">
+                    <label>邮箱</label>
+                    <input type="email" id="addEmail" placeholder="请输入邮箱（可选）">
+                </div>
+            </div>
+            <div class="auth-modal-footer">
+                <button class="btn btn-outline" onclick="closeAddUserDialog()">取消</button>
+                <button class="btn btn-primary" onclick="createUserFromForm()">创建用户</button>
             </div>
         </div>
     </div>
