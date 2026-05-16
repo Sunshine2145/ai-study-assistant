@@ -1,28 +1,34 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm list *)",
-      "Bash(npx -y @mcp-b/chrome-devtools-mcp --version)",
-      "Bash(npx @mcp-b/chrome-devtools-mcp --help)",
-      "Bash(npm info *)",
-      "Bash(npx chrome-mcp *)",
-      "Bash(npm ls *)",
-      "Bash(node -e \"const fs=require\\('fs'\\); const d=JSON.parse\\(fs.readFileSync\\('C:/Users/pc/.claude/settings.json','utf8'\\)\\); console.log\\(JSON.stringify\\(d, null, 2\\)\\)\")",
-      "Bash(curl -s http://127.0.0.1:5001/health)",
-      "Bash(python -m http.server 5500)",
-      "Bash(curl -s -I http://127.0.0.1:5500/index.html)",
-      "Bash(npm test *)",
-      "Bash(npx playwright *)",
-      "Skill(playwright-cli)",
-      "Skill(playwright-cli:*)",
-      "Bash(pip show *)",
+      "Read",
+      "Write",
+      "Edit",
+      "Bash(npm *)",
+      "Bash(yarn *)",
+      "Bash(pnpm *)",
+      "Bash(node *)",
+      "Bash(npx *)",
+      "Bash(git *)",
+      "Bash(cd *)",
+      "Bash(mkdir *)",
+      "Bash(touch *)",
+      "Bash(cp *)",
+      "Bash(mv *)",
+      "Bash(ls *)",
       "Bash(python run.py)",
-      "Bash(npx serve *)",
-      "Bash(git fetch *)",
-      "Bash(git stash *)"
+      "Bash(python -m http.server 5000)",
+      "Bash(netstat -ano)",
+      "Bash(taskkill //PID 40640 //F)"
     ],
-    "additionalDirectories": [
-      "C:\\Users\\pc"
+    "deny": [
+      "Bash(sudo *)",
+      "Bash(rm -rf *)",
+      "Bash(curl *)",
+      "Bash(wget *)",
+      "Bash(ssh *)",
+      "Bash(docker *)"
     ]
-  }
+  },
+  "permissionMode": "auto"
 }
