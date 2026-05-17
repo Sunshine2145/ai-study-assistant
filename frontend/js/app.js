@@ -3,6 +3,22 @@
  * 实现界面交互功能 + API集成
  */
 
+import {
+    PRD_MODULES,
+    DEFAULT_PERMISSIONS,
+    formatText,
+    getPageTitle,
+    getQuestionTypeLabel,
+    calcPracticeProgress,
+    buildUploadQuestionsUrl,
+    checkAnswerMatch,
+    parseStoredUser,
+    shouldShowAdminNav,
+    getNavItemDisplayState,
+    togglePermission,
+    renderPhaseIndicatorHtml,
+} from './lib/utils.js';
+
 // ========================================
 // 配置
 // ========================================
@@ -73,10 +89,7 @@ const api = {
     async getReminders() { return await this.request('/reminders'); },
     async uploadQuestions(formData, useAiParse = true, aiProvider = 'deepseek') {
         try {
-            const params = useAiParse
-                ? `?use_ai_parse=true&ai_provider=${aiProvider}`
-                : `?use_ai_parse=false`;
-            const url = `${API_BASE}/upload/questions${params}`;
+            const url = buildUploadQuestionsUrl(API_BASE, useAiParse, aiProvider);
             const response = await fetch(url, {
                 method: 'POST',
                 body: formData
@@ -215,9 +228,8 @@ function navigateTo(page) {
     const activeNav = document.querySelector(`.nav-item[data-page="${page}"]`);
     if (activeNav) activeNav.classList.add('active');
 
-    const pageTitles = { 'home': '学习首页', 'learn': '开始学习', 'map': '学习地图', 'practice': '题目练习', 'wrong': '错题本', 'report': '学习报告', 'upload': '题库上传', 'question-bank': '题库管理', 'ai-qa': 'AI问答', 'user-management': '用户管理', 'login': '登录', 'register': '注册' };
     const pageTitle = document.getElementById('pageTitle');
-    if (pageTitle && pageTitles[page]) pageTitle.textContent = pageTitles[page];
+    if (pageTitle) pageTitle.textContent = getPageTitle(page);
 
     const sidebar = document.getElementById('sidebar');
     // Hide sidebar for login/register pages
@@ -442,10 +454,10 @@ function renderQuestion(index) {
     if (!question) return;
     document.getElementById('practiceTitle').textContent = `题目练习 - ${state.currentKnowledge?.name || ''}`;
     document.getElementById('practiceProgress').textContent = `第${index + 1}题/共${state.questions.length}题`;
-    document.getElementById('practiceFill').style.width = `${((index + 1) / state.questions.length * 100)}%`;
-    document.getElementById('practicePercent').textContent = `${Math.round((index + 1) / state.questions.length * 100)}%`;
-    const typeMap = { 'single': '单项选择题', 'multi': '多项选择题', 'judge': '判断题' };
-    document.getElementById('questionType').textContent = typeMap[question.type] || '选择题';
+    const progress = calcPracticeProgress(index, state.questions.length);
+    document.getElementById('practiceFill').style.width = `${progress.widthPercent}%`;
+    document.getElementById('practicePercent').textContent = `${progress.percent}%`;
+    document.getElementById('questionType').textContent = getQuestionTypeLabel(question.type);
     document.getElementById('questionContent').textContent = question.content;
     const optionsList = document.getElementById('optionsList');
     if (question.type === 'judge') {
@@ -533,14 +545,14 @@ function initPractice() {
             const question = state.questions[state.currentQuestionIndex];
             await api.submitAnswer(question.id, selectedAnswer);
             const correctAnswer = String(question.answer).toLowerCase();
-            selectedAnswer = String(selectedAnswer).toLowerCase();
+            const normalizedSelected = String(selectedAnswer).toLowerCase();
             options.forEach(option => {
                 const value = option.getAttribute('data-value').toLowerCase();
                 if (value === correctAnswer) option.classList.add('correct');
-                else if (value === selectedAnswer && value !== correctAnswer) option.classList.add('wrong');
+                else if (value === normalizedSelected && value !== correctAnswer) option.classList.add('wrong');
             });
             analysisCard.style.display = 'block';
-            const isCorrect = selectedAnswer === correctAnswer;
+            const isCorrect = checkAnswerMatch(selectedAnswer, question.answer);
             if (isCorrect) {
                 document.getElementById('analysisHeader').innerHTML = '<i class="fas fa-check-circle"></i><span>回答正确！ +10分</span>';
                 document.getElementById('analysisText').textContent = question.analysis || '回答正确！';
@@ -651,11 +663,6 @@ function addAIMessage(text) {
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-function formatText(text) {
-    return text
-        .replace(/\*\*(.*?)\*\*/g, '<span class="knowledge-tag" onclick="showKnowledgeCard(\'$1\')">$1</span>')
-        .replace(/\n/g, '<br>');
-}
 function getCurrentTime() { return new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }); }
 
 async function startLearn(code) {
@@ -681,27 +688,7 @@ async function selectKnowledgePoint(knowledgeId, knowledgeName) {
 }
 
 function renderPhaseIndicator(currentPhase) {
-    const phases = [
-        { key: 'feynman', label: '1.费曼学习', icon: 'fa-book-open' },
-        { key: 'interactive', label: '2.互动学习', icon: 'fa-comments' },
-        { key: 'socratic', label: '3.苏格拉底检验', icon: 'fa-brain' }
-    ];
-    const phaseOrder = ['feynman', 'interactive', 'socratic', 'completed'];
-    const currentIdx = phaseOrder.indexOf(currentPhase);
-
-    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
-        ${phases.map((p, i) => {
-            const pIdx = phaseOrder.indexOf(p.key);
-            const isCompleted = currentIdx > pIdx || currentPhase === 'completed';
-            const isCurrent = currentPhase === p.key;
-            let bg, color;
-            if (isCompleted) { bg = '#10B981'; color = 'white'; }
-            else if (isCurrent) { bg = '#2563EB'; color = 'white'; }
-            else { bg = '#e2e8f0'; color = '#64748b'; }
-            const checkmark = isCompleted ? '✓ ' : '';
-            return `<span style="background:${bg};color:${color};padding:4px 12px;border-radius:16px;font-size:12px;">${checkmark}${p.label}</span>`;
-        }).join('<span style="color:#94a3b8;">→</span>')}
-    </div>`;
+    return renderPhaseIndicatorHtml(currentPhase);
 }
 
 function updatePhaseDisplay() {
@@ -1767,35 +1754,6 @@ async function loadUserManagementData() {
 
 // ── 模块权限常量 ──────────────────────────────────
 
-const PRD_MODULES = [
-    { key: 'map', name: '学习地图', group: '学习相关' },
-    { key: 'learn', name: '知识点讲解（费曼学习法）', group: '学习相关' },
-    { key: 'socratic', name: 'AI帮测（苏格拉底提问）', group: '学习相关' },
-    { key: 'practice', name: '题目练习', group: '学习相关' },
-    { key: 'wrong', name: '错题本', group: '学习相关' },
-    { key: 'report', name: '学习报告', group: '学习相关' },
-    { key: 'upload', name: '题库上传', group: '题库相关' },
-    { key: 'question-bank', name: '题库管理', group: '题库相关' },
-    { key: 'ai-qa', name: 'AI问答', group: 'AI相关' },
-];
-
-const DEFAULT_PERMISSIONS = PRD_MODULES.map(m => m.key);
-
-const PAGE_PERMISSION_MAP = {
-    'home': null,
-    'map': 'map',
-    'learn': 'learn',
-    'practice': 'practice',
-    'wrong': 'wrong',
-    'report': 'report',
-    'upload': 'upload',
-    'question-bank': 'question-bank',
-    'ai-qa': 'ai-qa',
-    'user-management': null,
-    'login': null,
-    'register': null,
-};
-
 // ── 编辑用户模态框 ──────────────────────────────────
 
 async function openEditUserModal(userId) {
@@ -1875,11 +1833,7 @@ function renderAuthModules(selectedPerms) {
 }
 
 function toggleAuthModule(key, checked) {
-    if (checked) {
-        if (!currentAuthPermissions.includes(key)) { currentAuthPermissions.push(key); }
-    } else {
-        currentAuthPermissions = currentAuthPermissions.filter(k => k !== key);
-    }
+    currentAuthPermissions = togglePermission(currentAuthPermissions, key, checked);
 }
 
 async function saveAuthPermissions() {
@@ -1954,29 +1908,26 @@ async function createUserFromForm() {
 
 function showUserManagementNav(role) {
     const nav = document.getElementById('userManagementNav');
-    if (nav) { nav.style.display = role === 'admin' ? 'block' : 'none'; }
+    if (nav) { nav.style.display = shouldShowAdminNav(role) ? 'block' : 'none'; }
 }
 
 // ── 导航权限校验 ──────────────────────────────────
 
 function applyNavPermissionCheck() {
-    const userStr = localStorage.getItem('user');
-    if (!userStr) return;
-    let user;
-    try { user = JSON.parse(userStr); } catch { return; }
-    const permissions = user.permissions || [];
-    const role = user.role || 'user';
+    const user = parseStoredUser(localStorage.getItem('user'));
+    if (!user) return;
     document.querySelectorAll('.nav-item').forEach(item => {
         const page = item.getAttribute('data-page');
         if (!page) return;
-        if (page === 'user-management') {
-            item.style.display = role === 'admin' ? '' : 'none';
+        const navState = getNavItemDisplayState(user, page);
+        if (navState.hide) {
+            item.style.display = 'none';
             return;
         }
-        const requiredPerm = PAGE_PERMISSION_MAP[page];
-        if (requiredPerm && !permissions.includes(requiredPerm)) {
+        item.style.display = '';
+        if (navState.disabled) {
             item.classList.add('nav-disabled');
-            item.title = '该功能未授权，请联系管理员';
+            item.title = navState.title;
         } else {
             item.classList.remove('nav-disabled');
             item.title = '';
@@ -1991,3 +1942,45 @@ function afterLogin(userData) {
     loadUserInfo();
     navigateTo('map');
 }
+
+// ES Module：将 HTML onclick 依赖的函数挂到 window
+Object.assign(window, {
+    navigateTo,
+    doLogout,
+    switchLoginTab,
+    sendLoginCode,
+    doLoginNew,
+    doRegisterNew,
+    showRegister,
+    showLogin,
+    refreshQuestionBank,
+    showAddKnowledgeForm,
+    hideKnowledgeForm,
+    saveKnowledgePoint,
+    startLearn,
+    selectKnowledgePoint,
+    reviewWrong,
+    transitionToSocratic,
+    showKnowledgeCard,
+    closeKnowledgeCard,
+    loadQuestions,
+    deleteBank,
+    toggleQuestionDetail,
+    approveQuestion,
+    deleteQuestion,
+    editKnowledgePoint,
+    deleteKnowledgePoint,
+    resetLearningMap,
+    showAddUserDialog,
+    closeAddUserDialog,
+    createUserFromForm,
+    editUser,
+    openAuthModal,
+    closeAuthModal,
+    toggleAuthModule,
+    resetAuthDefaults,
+    saveAuthPermissions,
+    closeEditUserModal,
+    saveEditUser,
+    toggleUserStatus,
+});

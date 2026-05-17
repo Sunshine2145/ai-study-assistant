@@ -142,6 +142,11 @@ jobs:
           echo "=== JS 文件 ==="
           find frontend/ -name "*.js" -exec echo "  Found: {}" \;
 
+      - name: 🧪 前端单元测试 (Vitest)
+        run: |
+          npm ci
+          npm run test:frontend
+
   # ─────────────────────────────────────────────
   # Job 3: 安全扫描
   # ─────────────────────────────────────────────
